@@ -4,7 +4,9 @@
 
 Builds the grid on first run, fetches new iNaturalist sightings for every tracked group,
 looks up their elevations, and rebuilds the per-group and per-species models. Host-tree basal
-area per cell (hosts.json) is built once from the USFS tree maps and kept with the data.
+area per cell (hosts.json) is built once from the USFS tree maps and kept with the data. Weather
+(NOAA GHCN-Daily) is reloaded every run: recent conditions per cell, and per model a table of how
+the weather before finds differs from usual.
 """
 from __future__ import annotations
 
@@ -20,6 +22,7 @@ from grid import build_grid
 from hosts import build_hosts, host_score
 from model import build_model
 from observations import update_group
+from weather import current_json, load_weather, weather_model
 
 MIN_SPECIES_OBS = 25  # fewer sightings than this and a species shares its group's map
 # Weighted host basal area (ft²/acre, averaged over the cell) that gives a host score of 0.5.
@@ -57,6 +60,7 @@ def main() -> None:
     parser.add_argument("--groups", help="Comma-separated group ids (default: all)")
     parser.add_argument("--skip-fetch", action="store_true", help="Rebuild models from stored sightings only")
     parser.add_argument("--rebuild-grid", action="store_true")
+    parser.add_argument("--skip-weather", action="store_true", help="Leave weather out of the models")
     args = parser.parse_args()
 
     catalog = load_catalog()
@@ -81,6 +85,14 @@ def main() -> None:
         grid["cells"], codes, stored_hosts["basalArea"],
         save=lambda ba: write_json(hosts_path, {"cells": len(grid["cells"]), "basalArea": ba}),
     )
+
+    wx = None
+    if not args.skip_weather:
+        wx = load_weather()
+        centres = [h3.cell_to_latlng(c) for c in grid["cells"]]
+        p14, t7 = wx.current([c[0] for c in centres], [c[1] for c in centres], [e if e is not None else float("nan") for e in grid["elev"]])
+        write_json(args.data / "weather" / "current.json", current_json(wx.as_of, p14, t7))
+        print(f"weather as of {wx.as_of}: {int((p14 == p14).sum())} cells with rain, {int((t7 == t7).sum())} with temperature")
 
     index_path = args.data / "model" / "index.json"
     index = read_json(index_path, {"models": []})
@@ -112,6 +124,10 @@ def main() -> None:
             at_obs = [host[i] for r in rows if (i := cell_index.get(h3.latlng_to_cell(r[2], r[3], grid["res"]))) is not None]
             print(f"  host score: {host.mean():.2f} across the region, {sum(at_obs) / max(len(at_obs), 1):.2f} where found")
 
+        conds = wx.sighting_conditions(rows) if wx else {}
+        if conds:
+            print(f"  weather before {len(conds)} of {len(rows)} sightings")
+
         models = [(g["id"], "group", g["name"], rows)]
         for s in g["species"]:
             srows = by_species.get(s["id"], [])
@@ -120,7 +136,11 @@ def main() -> None:
         for model_id, kind, label, mrows in models:
             if not mrows:
                 continue
-            write_json(args.data / "model" / f"{model_id}.json", build_model(model_id, mrows, cell_index, grid["res"], host, host_floor))
+            model = build_model(model_id, mrows, cell_index, grid["res"], host, host_floor)
+            weather = weather_model(conds, [r[0] for r in mrows])
+            if weather:
+                model["weather"] = weather
+            write_json(args.data / "model" / f"{model_id}.json", model)
             entries[model_id] = {"id": model_id, "kind": kind, "groupId": g["id"], "label": label, "count": len(mrows)}
             print(f"  model {model_id}: {len(mrows)} sightings")
 
