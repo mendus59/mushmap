@@ -116,7 +116,14 @@ def build_hosts(
         for name, archive_codes in by_archive.items():
             archive = download(name, tmpdir)
             for code in archive_codes:
-                img = extract_species(archive, code, tmpdir / f"s{code}")
+                try:
+                    img = extract_species(archive, code, tmpdir / f"s{code}")
+                except FileNotFoundError as err:
+                    # Not every FIA species has a map (e.g. Oregon white oak, 815). Store it as empty
+                    # so later runs do not download the archive again for it.
+                    print(f"  skipping s{code}: {err}")
+                    out[str(code)] = []
+                    continue
                 means = cell_means(img, lats, lons, owners, len(cells))
                 out[str(code)] = [round(float(v), 1) for v in means]
                 print(f"  s{code}: {np.count_nonzero(means > 1)} cells over 1 ft²/acre, max {means.max():.0f}")
@@ -132,6 +139,6 @@ def host_score(hosts: dict[str, list[float]], host_trees: list[dict], n_cells: i
     total = np.zeros(n_cells)
     for t in host_trees:
         values = hosts.get(str(t["fia"]))
-        if values is not None:
+        if values:  # missing, or [] for a species without a map
             total += t["weight"] * np.asarray(values)
     return 1 - np.exp(-total * np.log(2) / half_ba)

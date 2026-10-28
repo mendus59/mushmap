@@ -81,18 +81,19 @@ def test_build_hosts_only_fetches_missing_codes(tmp_path, monkeypatch):
 
     monkeypatch.setattr(hosts, "download", fake_download)
     saved = []
-    out = hosts.build_hosts(CELLS, [202, 17], {"17": [0.0] * len(CELLS)}, save=saved.append)
-    assert set(out) == {"17", "202"}
+    out = hosts.build_hosts(CELLS, [202, 17, 98], {"17": [0.0] * len(CELLS)}, save=saved.append)
+    assert set(out) == {"17", "202", "98"}
+    assert out["98"] == []  # not in the archive: stored empty, not fatal
     assert len(out["202"]) == len(CELLS) and max(out["202"]) > 100
     assert saved and saved[-1] is out
     # Nothing missing: no download.
     monkeypatch.setattr(hosts, "download", lambda *a: (_ for _ in ()).throw(AssertionError("downloaded")))
-    assert hosts.build_hosts(CELLS, [202], out) == out
+    assert hosts.build_hosts(CELLS, [202, 98], out) == out
 
 
 def test_host_score_weights_and_saturates():
-    ba = {"202": [0.0, 20.0, 200.0], "17": [20.0, 0.0, 0.0]}
-    trees = [{"fia": 202, "weight": 1}, {"fia": 17, "weight": 0.5}, {"fia": 999, "weight": 1}]
+    ba = {"202": [0.0, 20.0, 200.0], "17": [20.0, 0.0, 0.0], "815": []}
+    trees = [{"fia": 202, "weight": 1}, {"fia": 17, "weight": 0.5}, {"fia": 999, "weight": 1}, {"fia": 815, "weight": 1}]
     score = hosts.host_score(ba, trees, 3, half_ba=20)
     assert score[1] == np.float64(0.5)
     assert 0.29 < score[0] < 0.30  # 10 weighted ft²/acre
