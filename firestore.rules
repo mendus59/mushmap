@@ -1,0 +1,21 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Each user can only see and change their own finds and photos.
+    match /users/{uid}/finds/{findId} {
+      allow read, delete: if isOwner(uid);
+      allow create, update: if isOwner(uid)
+        && request.resource.data.keys().hasAll(['takenAt', 'lat', 'lon', 'speciesId', 'customName', 'photoCount'])
+        && (request.resource.data.speciesId is string || request.resource.data.customName is string);
+
+      match /photos/{photoId} {
+        allow read, delete: if isOwner(uid);
+        allow create, update: if isOwner(uid) && request.resource.data.data is bytes;
+      }
+    }
+
+    function isOwner(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+  }
+}
