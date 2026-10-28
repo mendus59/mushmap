@@ -53,6 +53,10 @@ jobs:
           python pipeline/run.py "${args[@]}"
           du -sh generated generated/*
 
+      - name: Forecast
+        # The daily forecast job keeps this fresh; a failure here should not hold up the weekly data.
+        run: python pipeline/forecast.py --data generated || echo "::warning::Forecast failed"
+
       - name: Publish to data branch
         if: github.event_name == 'schedule' || inputs.publish
         env:

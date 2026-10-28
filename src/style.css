@@ -114,3 +114,11 @@ dd { margin: 0; }
 .ramp { height: 12px; border-radius: 6px; background: linear-gradient(to right, #ffe9a8, #f6a03d, #d9542c, #8c1d18); }
 input[type=range] { width: 100%; margin-top: 6px; }
 .maplibregl-popup-content { color: #24261f; }
+
+.outlook { display: flex; gap: 6px; align-items: flex-end; }
+.outlook-week { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 4px; }
+.outlook-week .bar { width: 60%; background: #d9542c; border-radius: 3px 3px 0 0; }
+.outlook-week.active { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.outlook-week small { font-size: 0.75rem; }
+.spots { margin: 0; padding-left: 1.4em; display: grid; gap: 6px; }
+.spot { width: 100%; text-align: left; display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }

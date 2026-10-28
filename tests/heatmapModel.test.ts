@@ -1,7 +1,9 @@
+import { cellToParent, gridDisk, latLngToCell } from 'h3-js';
 import { describe, expect, it } from 'vitest';
 import {
-  isoWeek, scoreCells, weatherApplies, weatherLift, weekStart,
-  type CurrentWeather, type Grid, type Model, type WeatherModel,
+  forecastPointIndex, forecastWeather, isoWeek, ownFindHistory, scoreCells, topSpots, weatherApplies,
+  weatherForWeek, weatherLift, weekStart,
+  type CellScore, type CurrentWeather, type Forecast, type Grid, type Model, type WeatherModel,
 } from '../src/heatmapModel';
 
 const grid: Grid = { res: 7, states: ['Test'], cells: ['a', 'b', 'c', 'd'], elev: [100, 1000, 100, null] };
@@ -81,5 +83,62 @@ describe('weeks', () => {
   it('finds the Monday a week starts on', () => {
     expect(weekStart(2026, 44).toISOString().slice(0, 10)).toBe('2026-10-26');
     expect(weekStart(2026, 1).toISOString().slice(0, 10)).toBe('2025-12-29');
+  });
+});
+
+describe('forecast', () => {
+  const a = latLngToCell(47.6, -122.3, 7);
+  const b = latLngToCell(45.5, -122.6, 7);
+  const real: Grid = { res: 7, states: ['Test'], cells: [a, b], elev: [100, 1100] };
+  const forecast: Forecast = {
+    asOf: '2026-10-28', source: 'test', res: 4, pDays: 14, tDays: 7,
+    points: [cellToParent(b, 4)], elev: [100],
+    weeks: [{ week: 45, date: '2026-11-05', pKnown: 14, tKnown: 7, p14: [80], t7: [10] }],
+  };
+  const pointIndex = forecastPointIndex(real, forecast);
+
+  it('maps cells to their forecast point and moves temperature to the cell elevation', () => {
+    expect(Array.from(pointIndex)).toEqual([-1, 0]);
+    const w = forecastWeather(real, forecast, pointIndex, 45)!;
+    expect(w.p14).toEqual([null, 80]);
+    expect(w.t7[1]).toBeCloseTo(3.5); // 1,000 m higher: 6.5 °C colder
+    expect(w.forecastFor).toBe('2026-11-05');
+    expect(forecastWeather(real, forecast, pointIndex, 46)).toBeNull();
+  });
+
+  it('prefers the forecast, then falls back to station weather near its week', () => {
+    const current: CurrentWeather = { asOf: '2026-10-25', pDays: 14, tDays: 7, p14: [1, 2], t7: [3, 4] };
+    const f = { data: forecast, pointIndex };
+    expect(weatherForWeek(real, 45, current, f)?.forecastFor).toBe('2026-11-05');
+    expect(weatherForWeek(real, 44, current, f)).toBe(current);
+    expect(weatherForWeek(real, 50, current, f)).toBeNull();
+  });
+});
+
+describe('own finds and top spots', () => {
+  const centre = latLngToCell(46, -121, 7);
+  const ring = gridDisk(centre, 4);
+  const real: Grid = { res: 7, states: ['Test'], cells: ring, elev: ring.map(() => 100) };
+  const index = new Map(ring.map((c, i) => [c, i]));
+
+  it('raises history at and around the user\'s finds', () => {
+    const own = ownFindHistory(real, index, [centre]);
+    expect(own.get(index.get(centre)!)).toBe(1);
+    expect(own.size).toBe(7);
+    const m = model();
+    const scores = scoreCells(real, { ...m, historyIdx: [], historyVal: [] }, 18, 0, null, own);
+    const at = scores.find((s) => s.index === index.get(centre))!;
+    expect(at.own).toBe(true);
+    expect(at.score).toBeCloseTo(1);
+  });
+
+  it('picks the best cells that are apart from each other', () => {
+    const scores: CellScore[] = ring.map((_, i) => ({
+      index: i, score: i === index.get(centre) ? 0.9 : 0.5, season: 1, history: 0, own: false, host: null, weather: null,
+    }));
+    const spots = topSpots(real, scores, 5, 3);
+    expect(spots[0].index).toBe(index.get(centre));
+    // Everything within 3 cells of the centre is taken by the first pick, so the rest lie on the outer ring.
+    for (const s of spots.slice(1)) expect(gridDisk(centre, 3)).not.toContain(ring[s.index]);
   });
 });
