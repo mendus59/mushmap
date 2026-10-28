@@ -122,3 +122,10 @@ input[type=range] { width: 100%; margin-top: 6px; }
 .outlook-week small { font-size: 0.75rem; }
 .spots { margin: 0; padding-left: 1.4em; display: grid; gap: 6px; }
 .spot { width: 100%; text-align: left; display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+
+.ramp.access { background: linear-gradient(to right, #9e2a2a, #e08a2c, #d9c13a, #6aa84f, #1f7a3a); }
+.trail-results { margin: 0; padding-left: 1.6em; display: grid; gap: 8px; }
+.trail { width: 100%; text-align: left; display: flex; flex-direction: column; gap: 4px; }
+.trail .overall { font-weight: 700; font-size: 1.1rem; color: var(--accent); }
+.trail-scores { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 0.9rem; }
+.access-chip { border-left: 4px solid var(--chip); padding-left: 6px; }

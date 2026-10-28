@@ -9,10 +9,10 @@ const app = document.getElementById('app')!;
 const nav = document.getElementById('nav')!;
 let user: User | null = null;
 
-type Route = 'finds' | 'add' | 'heatmap';
+type Route = 'finds' | 'add' | 'heatmap' | 'trails';
 const currentRoute = (): Route => {
   const r = location.hash.replace(/^#\/?/, '');
-  return r === 'add' || r === 'heatmap' ? r : 'finds';
+  return r === 'add' || r === 'heatmap' || r === 'trails' ? r : 'finds';
 };
 
 function renderNav() {
@@ -24,6 +24,7 @@ function renderNav() {
     link('finds', 'My finds'),
     link('add', 'Log a find'),
     link('heatmap', 'Heat map'),
+    link('trails', 'Trail finder'),
     h('button', { class: 'link', onclick: () => signOut(getFirebase().auth) }, 'Sign out'),
   );
 }
@@ -53,6 +54,11 @@ async function render() {
     case 'heatmap': {
       const { heatmapView } = await import('./views/heatmap');
       app.append(heatmapView(catalog, uid));
+      break;
+    }
+    case 'trails': {
+      const { trailsView } = await import('./views/trails');
+      app.append(trailsView(catalog, uid));
       break;
     }
     default: {

@@ -7,30 +7,9 @@ import {
   type CellScore, type CurrentWeather, type Forecast, type Grid, type Model, type ModelIndex,
 } from '../heatmapModel';
 import { SAFETY_NOTE, legalNoteEl } from '../legal';
+import { fillModelSelect, getJson, shortDate, weekLabel } from '../generated';
 import { createMap, maplibregl } from '../map';
 import { expandSpeciesId, type Catalog } from '../species';
-
-const DATA = `${import.meta.env.BASE_URL}data/generated`;
-
-async function getJson<T>(path: string): Promise<T | null> {
-  const r = await fetch(`${DATA}/${path}`);
-  if (r.status === 404) return null;
-  if (!r.ok) throw new Error(`Could not load ${path} (${r.status})`);
-  return r.json() as Promise<T>;
-}
-
-function weekLabel(week: number): string {
-  const year = new Date().getFullYear();
-  const start = weekStart(year, week);
-  const end = new Date(start);
-  end.setUTCDate(start.getUTCDate() + 6);
-  const fmt = (d: Date) => d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', timeZone: 'UTC' });
-  return `Week ${week}: ${fmt(start)} to ${fmt(end)}`;
-}
-
-function shortDate(iso: string): string {
-  return new Date(`${iso}T12:00:00`).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-}
 
 /** How many weeks the outlook strip shows, starting with this week. */
 const OUTLOOK_WEEKS = 5;
@@ -232,13 +211,7 @@ export function heatmapView(catalog: Catalog, uid: string): HTMLElement {
       findCells = finds
         .filter((x) => x.speciesId && x.lat !== null && x.lon !== null)
         .map((x) => ({ speciesId: x.speciesId!, cell: latLngToCell(x.lat!, x.lon!, g.res) }));
-      for (const group of catalog.groups) {
-        const entries = index.models.filter((m) => m.groupId === group.id);
-        if (!entries.length) continue;
-        select.append(h('optgroup', { label: group.name },
-          ...entries.map((m) => h('option', { value: m.id },
-            `${m.kind === 'group' ? `All ${group.name.toLowerCase()}` : m.label} (${m.count.toLocaleString()} sightings)`))));
-      }
+      fillModelSelect(select, catalog, index);
       status.textContent = `Data updated ${new Date(index.generatedAt).toLocaleDateString()}.`;
       await loadModel(select.value);
     } catch (e) {
