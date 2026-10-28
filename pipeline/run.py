@@ -2,7 +2,7 @@
 
     python pipeline/run.py --data <dir>
 
-Builds the grid on first run, fetches new iNaturalist sightings for every tracked group,
+Builds the grid on first run, the trail data monthly (trails.py), fetches new iNaturalist sightings for every tracked group,
 looks up their elevations, and rebuilds the per-group and per-species models. Host-tree basal
 area per cell (hosts.json) is built once from the USFS tree maps and kept with the data. Weather
 (NOAA GHCN-Daily) is reloaded every run: recent conditions per cell, and per model a table of how
@@ -22,6 +22,7 @@ from grid import build_grid
 from hosts import build_hosts, host_score
 from model import build_model
 from observations import update_group
+from trails import build as build_trails, build_if_stale as build_trails_if_stale
 from weather import current_json, load_weather, weather_model
 
 MIN_SPECIES_OBS = 25  # fewer sightings than this and a species shares its group's map
@@ -61,6 +62,8 @@ def main() -> None:
     parser.add_argument("--skip-fetch", action="store_true", help="Rebuild models from stored sightings only")
     parser.add_argument("--rebuild-grid", action="store_true")
     parser.add_argument("--skip-weather", action="store_true", help="Leave weather out of the models")
+    parser.add_argument("--skip-trails", action="store_true", help="Leave the trail data as it is")
+    parser.add_argument("--only-trails", action="store_true", help="Rebuild the trail data and nothing else")
     args = parser.parse_args()
 
     catalog = load_catalog()
@@ -75,6 +78,15 @@ def main() -> None:
         grid = build_grid()
         write_json(grid_path, grid)
     cell_index = {c: i for i, c in enumerate(grid["cells"])}
+
+    if args.only_trails:
+        build_trails(args.data)
+        return
+    if not args.skip_trails:
+        try:
+            build_trails_if_stale(args.data)
+        except Exception as err:  # the trail finder can wait a week; the heat map should not
+            print(f"::warning::Trail data not rebuilt: {err}")
 
     hosts_path = args.data / "hosts.json"
     stored_hosts = read_json(hosts_path, {})

@@ -32,20 +32,26 @@ def decode_terrarium(r: int, g: int, b: int) -> float:
 
 
 class TileSampler:
-    def __init__(self) -> None:
+    def __init__(self, zoom: int = ZOOM, max_tiles: int | None = None) -> None:
+        self.zoom = zoom
+        self.max_tiles = max_tiles  # oldest tiles are dropped past this, to bound memory
         self.tiles: dict[tuple[int, int], Image.Image] = {}
+        self.loaded = 0
 
     def tile(self, x: int, y: int) -> Image.Image:
         key = (x, y)
         if key not in self.tiles:
-            data = http_bytes(TILE_URL.format(z=ZOOM, x=x, y=y))
+            data = http_bytes(TILE_URL.format(z=self.zoom, x=x, y=y))
+            if self.max_tiles is not None and len(self.tiles) >= self.max_tiles:
+                del self.tiles[next(iter(self.tiles))]
             self.tiles[key] = Image.open(io.BytesIO(data)).convert("RGB")
-            if len(self.tiles) % 100 == 0:
-                print(f"  elevation tiles loaded: {len(self.tiles)}")
+            self.loaded += 1
+            if self.loaded % 100 == 0:
+                print(f"  elevation tiles loaded: {self.loaded}")
         return self.tiles[key]
 
     def elevation(self, lat: float, lon: float) -> int:
-        tx, ty, px, py = tile_position(lat, lon)
+        tx, ty, px, py = tile_position(lat, lon, self.zoom)
         return round(decode_terrarium(*self.tile(tx, ty).getpixel((px, py))))
 
 
