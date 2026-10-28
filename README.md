@@ -7,9 +7,9 @@ A mushroom foraging journal and heat map for Washington and Oregon, hosted on Gi
   Pick a tracked species or group (searching "morels" lists every *Morchella*), or enter your own name.
   Add notes on cluster size, trees and plants nearby, substrate and habitat. Search finds by date range,
   species or group, text, map area or distance, as a list or on a map.
-- **Heat map.** A weekly likelihood map per species or group over Washington and Oregon. Version 1 uses the
-  weeks and elevations of research-grade iNaturalist sightings and how close past sightings are; host trees and
-  weather come next.
+- **Heat map.** A weekly likelihood map per species or group over Washington and Oregon. It uses the
+  weeks and elevations of research-grade iNaturalist sightings, how close past sightings are, and how much of
+  each mushroom's host trees grow in the cell; weather comes next.
 
 ## Stack
 
@@ -37,11 +37,14 @@ A mushroom foraging journal and heat map for Washington and Oregon, hosted on Gi
 the Actions tab:
 
 1. On first run, builds an H3 resolution 7 grid (about 5 km² cells) over Washington and Oregon from Census
-   state boundaries and samples each cell's elevation from AWS Terrain Tiles.
+   state boundaries and samples each cell's elevation from AWS Terrain Tiles. Also once, builds `hosts.json`:
+   live basal area per cell for every tree in a group's `hostTrees`, from the USDA Forest Service 250 m tree
+   species maps (Wilson et al. 2013, RDS-2013-0013; about 3 GB of downloads, deleted after use).
 2. Fetches new research-grade, unobscured iNaturalist sightings for each group's `inatTaxa` and looks up
    their elevations.
-3. Writes a model per group, and per species with at least 25 sightings: a smoothed week-by-elevation table
-   and a past-sightings density per cell.
+3. Writes a model per group, and per species with at least 25 sightings: a smoothed week-by-elevation table,
+   a past-sightings density per cell and a host-tree score per cell. `hostFloor` sets how much a cell with
+   none of the host trees still counts (1 means no host gate, as for wood-chip Psilocybe).
 4. Force-pushes the results as a single commit to the `data` branch and redeploys the site, which copies
    `cells.json` and `model/` into `data/generated/`. The browser combines them for the chosen week
    (`src/heatmapModel.ts`).

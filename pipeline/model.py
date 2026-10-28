@@ -1,8 +1,11 @@
-"""Heat map model v1: when and at what elevation a species fruits, and where it has been found.
+"""Heat map model v2: when and at what elevation a species fruits, where it has been found,
+and how much of its host trees grow in each cell.
 
-The browser combines the two per cell and week:
-    score = seasonElev[week][elevation bin] * (HISTORY_FLOOR + (1 - HISTORY_FLOOR) * history[cell])
-Host trees and weather join as further factors in later versions.
+The browser combines them per cell and week:
+    score = seasonElev[week][elevation bin]
+            * (HISTORY_FLOOR + (1 - HISTORY_FLOOR) * history[cell])
+            * (hostFloor + (1 - hostFloor) * host[cell])
+Weather joins as a further factor in a later version.
 """
 from __future__ import annotations
 
@@ -81,12 +84,26 @@ def history(obs_cells: list[str], cell_index: dict[str, int]) -> tuple[list[int]
     return idxs, vals
 
 
-def build_model(model_id: str, rows: list[list], cell_index: dict[str, int], resolution: int) -> dict:
-    """rows: [id, observed_on, lat, lon, taxon, elevation]."""
+def sparse_percent(values) -> tuple[list[int], list[int]]:
+    """0..1 values per cell as sparse (cell index, 0..100) lists, leaving out cells under 1%."""
+    idxs, vals = [], []
+    for i, v in enumerate(values):
+        p = round(100 * float(v))
+        if p >= 1:
+            idxs.append(i)
+            vals.append(p)
+    return idxs, vals
+
+
+def build_model(
+    model_id: str, rows: list[list], cell_index: dict[str, int], resolution: int,
+    host=None, host_floor: float = 1.0,
+) -> dict:
+    """rows: [id, observed_on, lat, lon, taxon, elevation]. host: 0..1 per grid cell, or None for no host gate."""
     season_obs = [(iso_week(r[1]), r[5]) for r in rows if r[5] is not None]
     obs_cells = [h3.latlng_to_cell(r[2], r[3], resolution) for r in rows]
     hist_idx, hist_val = history(obs_cells, cell_index)
-    return {
+    model = {
         "id": model_id,
         "count": len(rows),
         "elevBinM": ELEV_BIN_M,
@@ -95,3 +112,7 @@ def build_model(model_id: str, rows: list[list], cell_index: dict[str, int], res
         "historyIdx": hist_idx,
         "historyVal": hist_val,
     }
+    if host is not None and host_floor < 1:
+        model["hostFloor"] = host_floor
+        model["hostIdx"], model["hostVal"] = sparse_percent(host)
+    return model

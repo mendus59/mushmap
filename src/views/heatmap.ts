@@ -103,6 +103,7 @@ export function heatmapView(catalog: Catalog): HTMLElement {
           `<strong>${Math.round(s.score * 100)}% relative likelihood</strong><br>` +
           `Season and elevation fit: ${Math.round(s.season * 100)}%<br>` +
           `Past sightings nearby: ${Math.round(s.history * 100)}%<br>` +
+          (s.host === null ? '' : `Host trees: ${Math.round(s.host * 100)}%<br>`) +
           `Elevation: ${grid.elev[s.index]} m`,
         )
         .addTo(map);
@@ -150,9 +151,10 @@ export function heatmapView(catalog: Catalog): HTMLElement {
       h('div', { class: 'ramp' }),
       h('div', { class: 'row between' }, h('small', {}, 'Lower'), h('small', {}, 'Higher relative likelihood')),
       h('p', { class: 'muted' },
-        'Version 1 scores each cell from the weeks and elevations where research-grade iNaturalist sightings ' +
-        'in Washington and Oregon were made, and from how close past sightings are. Host trees and recent ' +
-        'weather are coming next. Many areas are private land or closed to harvest; check before you forage.'),
+        'Each cell is scored from the weeks and elevations where research-grade iNaturalist sightings ' +
+        'in Washington and Oregon were made, how close past sightings are, and how much of the ' +
+        'mushroom\'s host trees grow there (USDA Forest Service tree maps). Recent weather is coming next. ' +
+        'Many areas are private land or closed to harvest; check before you forage.'),
       h('p', { class: 'note' }, SAFETY_NOTE)),
   );
 }
