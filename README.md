@@ -9,8 +9,10 @@ A mushroom foraging journal and heat map for Washington and Oregon, hosted on Gi
   species or group, text, map area or distance, as a list or on a map.
 - **Heat map.** A weekly likelihood map per species or group over Washington and Oregon. It uses the
   weeks and elevations of research-grade iNaturalist sightings, how close past sightings are, how much of
-  each mushroom's host trees grow in the cell, and, for the coming weeks, how this year's recent rain and
-  temperature compare with the weather before past finds.
+  each mushroom's host trees grow in the cell, and, for the coming weeks, how this year's recent and forecast
+  rain and temperature compare with the weather before past finds. An outlook strip compares the next five
+  weeks across the region, a list names the most likely spots, and your own logged finds count as sightings
+  on your map.
 
 ## Stack
 
@@ -51,7 +53,11 @@ the Actions tab:
    sighting, compared with the same place and date in every other year. `weather/current.json` holds the
    latest 14-day rain and 7-day temperature per cell; the browser applies it to the measured week and the
    two after.
-4. Force-pushes the results as a single commit to the `data` branch and redeploys the site, which copies
+4. Writes `weather/forecast.json` (`pipeline/forecast.py`, also run daily by `.github/workflows/forecast.yml`):
+   the last three weeks and the 16-day forecast of rain and temperature from Open-Meteo at the centre of
+   each H3 resolution 4 cell, worked into the same 14-day rain and 7-day temperature for the Thursday of this
+   week and the next few. The browser uses it, moved to each cell's elevation, for any week it reaches.
+5. Force-pushes the results as a single commit to the `data` branch and redeploys the site, which copies
    `cells.json`, `model/` and `weather/` into `data/generated/`. The browser combines them for the chosen week
    (`src/heatmapModel.ts`).
 

@@ -52,7 +52,7 @@ async function render() {
     }
     case 'heatmap': {
       const { heatmapView } = await import('./views/heatmap');
-      app.append(heatmapView(catalog));
+      app.append(heatmapView(catalog, uid));
       break;
     }
     default: {

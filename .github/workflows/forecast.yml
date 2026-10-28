@@ -1,0 +1,60 @@
+name: Update weather forecast
+
+on:
+  schedule:
+    - cron: '0 13 * * *' # daily 13:00 UTC (5 or 6 a.m. Pacific)
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: Publish to the data branch and redeploy the site
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: heatmap-data
+  cancel-in-progress: false
+
+jobs:
+  forecast:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: pipeline/requirements.txt
+      - run: pip install -r pipeline/requirements.txt
+
+      - name: Get current data
+        run: |
+          if ! git ls-remote --exit-code --heads origin data >/dev/null; then
+            echo "No data branch yet; the weekly data run builds the grid first."
+            exit 1
+          fi
+          mkdir -p generated
+          git fetch --depth 1 origin data
+          git archive FETCH_HEAD | tar -x -C generated
+          echo "DATA_MESSAGE=$(git log -1 --format=%s FETCH_HEAD)" >> "$GITHUB_ENV"
+
+      - run: python pipeline/forecast.py --data generated
+
+      - name: Publish to data branch
+        if: github.event_name == 'schedule' || inputs.publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cd generated
+          git init -q -b data
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          # Keep the weekly run's message; the data branch stays one snapshot commit.
+          git commit -q -m "${DATA_MESSAGE%%, forecast*}, forecast $(date -u +%Y-%m-%d)"
+          git push --force "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" data
+          gh workflow run deploy.yml --repo "${{ github.repository }}" --ref main
