@@ -89,3 +89,13 @@ def test_to_row():
     r = {"id": 7, "observed_on": "2025-10-01", "geojson": {"coordinates": [-122.123456, 45.654321]}, "taxon": {"name": "Cantharellus formosus"}}
     assert to_row(r) == [7, "2025-10-01", 45.65432, -122.12346, "Cantharellus formosus"]
     assert to_row({"id": 8, "observed_on": None}) is None
+
+
+def test_tile_position_and_terrarium_decoding():
+    from elevation import decode_terrarium, tile_position
+    # Portland, OR at zoom 10 falls in tile 163/366.
+    tx, ty, px, py = tile_position(45.52, -122.68)
+    assert (tx, ty) == (163, 366)
+    assert 0 <= px < 256 and 0 <= py < 256
+    assert decode_terrarium(128, 0, 0) == 0
+    assert decode_terrarium(129, 44, 0) == 300
