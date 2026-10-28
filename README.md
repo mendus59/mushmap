@@ -19,7 +19,7 @@ A mushroom foraging journal and heat map for Washington and Oregon, hosted on Gi
 | Accounts and data | Firebase Authentication (Google, email) and Cloud Firestore on the free Spark plan |
 | Photos | Compressed in the browser to about 150 KB WebP and stored in Firestore (`users/{uid}/finds/{id}/photos/{n}`) |
 | Maps | MapLibre GL with OpenFreeMap tiles (free, no key) |
-| Elevation | Open-Meteo elevation API (free, no key) |
+| Elevation | Open-Meteo elevation API for single finds; AWS Terrain Tiles for the heat map grid (both free, no key) |
 
 ## Firebase setup
 
@@ -37,7 +37,7 @@ A mushroom foraging journal and heat map for Washington and Oregon, hosted on Gi
 the Actions tab:
 
 1. On first run, builds an H3 resolution 7 grid (about 5 km² cells) over Washington and Oregon from Census
-   state boundaries and looks up each cell's elevation (Open-Meteo).
+   state boundaries and samples each cell's elevation from AWS Terrain Tiles.
 2. Fetches new research-grade, unobscured iNaturalist sightings for each group's `inatTaxa` and looks up
    their elevations.
 3. Writes a model per group, and per species with at least 25 sightings: a smoothed week-by-elevation table
