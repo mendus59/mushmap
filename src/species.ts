@@ -9,6 +9,8 @@ export interface SpeciesGroup {
   id: string;
   name: string;
   aliases: string[];
+  /** iNaturalist taxon names the data pipeline queries for this group. */
+  inatTaxa: string[];
   legalNote?: boolean;
   species: Species[];
 }

@@ -4,104 +4,522 @@
     {
       "id": "morels",
       "name": "Morels",
-      "aliases": ["morel", "morchella", "sponge mushroom"],
+      "aliases": [
+        "morel",
+        "morchella",
+        "sponge mushroom"
+      ],
+      "inatTaxa": [
+        "Morchella"
+      ],
       "species": [
-        { "id": "morchella-americana", "scientificName": "Morchella americana", "commonNames": ["Yellow morel", "Common morel"], "synonyms": ["Morchella esculenta"] },
-        { "id": "morchella-angusticeps", "scientificName": "Morchella angusticeps", "commonNames": ["Black morel"], "synonyms": [] },
-        { "id": "morchella-septentrionalis", "scientificName": "Morchella septentrionalis", "commonNames": ["Northern black morel"], "synonyms": [] },
-        { "id": "morchella-punctipes", "scientificName": "Morchella punctipes", "commonNames": ["Half-free morel"], "synonyms": ["Morchella semilibera"] },
-        { "id": "morchella-importuna", "scientificName": "Morchella importuna", "commonNames": ["Landscape morel"], "synonyms": [] },
-        { "id": "morchella-brunnea", "scientificName": "Morchella brunnea", "commonNames": ["Natural black morel"], "synonyms": [] },
-        { "id": "morchella-snyderi", "scientificName": "Morchella snyderi", "commonNames": ["Snyder's morel"], "synonyms": [] },
-        { "id": "morchella-sextelata", "scientificName": "Morchella sextelata", "commonNames": ["Burn morel"], "synonyms": [] },
-        { "id": "morchella-tomentosa", "scientificName": "Morchella tomentosa", "commonNames": ["Gray fuzzy foot morel", "Burn morel"], "synonyms": [] },
-        { "id": "morchella-exuberans", "scientificName": "Morchella exuberans", "commonNames": ["Burn morel"], "synonyms": [] }
+        {
+          "id": "morchella-americana",
+          "scientificName": "Morchella americana",
+          "commonNames": [
+            "Yellow morel",
+            "Common morel"
+          ],
+          "synonyms": [
+            "Morchella esculenta"
+          ]
+        },
+        {
+          "id": "morchella-angusticeps",
+          "scientificName": "Morchella angusticeps",
+          "commonNames": [
+            "Black morel"
+          ],
+          "synonyms": []
+        },
+        {
+          "id": "morchella-septentrionalis",
+          "scientificName": "Morchella septentrionalis",
+          "commonNames": [
+            "Northern black morel"
+          ],
+          "synonyms": []
+        },
+        {
+          "id": "morchella-punctipes",
+          "scientificName": "Morchella punctipes",
+          "commonNames": [
+            "Half-free morel"
+          ],
+          "synonyms": [
+            "Morchella semilibera"
+          ]
+        },
+        {
+          "id": "morchella-importuna",
+          "scientificName": "Morchella importuna",
+          "commonNames": [
+            "Landscape morel"
+          ],
+          "synonyms": []
+        },
+        {
+          "id": "morchella-brunnea",
+          "scientificName": "Morchella brunnea",
+          "commonNames": [
+            "Natural black morel"
+          ],
+          "synonyms": []
+        },
+        {
+          "id": "morchella-snyderi",
+          "scientificName": "Morchella snyderi",
+          "commonNames": [
+            "Snyder's morel"
+          ],
+          "synonyms": []
+        },
+        {
+          "id": "morchella-sextelata",
+          "scientificName": "Morchella sextelata",
+          "commonNames": [
+            "Burn morel"
+          ],
+          "synonyms": []
+        },
+        {
+          "id": "morchella-tomentosa",
+          "scientificName": "Morchella tomentosa",
+          "commonNames": [
+            "Gray fuzzy foot morel",
+            "Burn morel"
+          ],
+          "synonyms": []
+        },
+        {
+          "id": "morchella-exuberans",
+          "scientificName": "Morchella exuberans",
+          "commonNames": [
+            "Burn morel"
+          ],
+          "synonyms": []
+        }
       ]
     },
     {
       "id": "porcini",
       "name": "Porcini",
-      "aliases": ["king bolete", "king boletes", "cep", "penny bun", "bolete"],
+      "aliases": [
+        "king bolete",
+        "king boletes",
+        "cep",
+        "penny bun",
+        "bolete"
+      ],
+      "inatTaxa": [
+        "Boletus edulis",
+        "Boletus rex-veris",
+        "Boletus barrowsii",
+        "Boletus regineus",
+        "Boletus variipes",
+        "Boletus chippewaensis",
+        "Boletus subcaerulescens"
+      ],
       "species": [
-        { "id": "boletus-edulis", "scientificName": "Boletus edulis", "commonNames": ["King bolete", "Porcino"], "synonyms": [] },
-        { "id": "boletus-rex-veris", "scientificName": "Boletus rex-veris", "commonNames": ["Spring king bolete"], "synonyms": [] },
-        { "id": "boletus-barrowsii", "scientificName": "Boletus barrowsii", "commonNames": ["White king bolete"], "synonyms": [] },
-        { "id": "boletus-regineus", "scientificName": "Boletus regineus", "commonNames": ["Queen bolete"], "synonyms": [] },
-        { "id": "boletus-variipes", "scientificName": "Boletus variipes", "commonNames": ["Variable-stalked bolete"], "synonyms": [] },
-        { "id": "boletus-chippewaensis", "scientificName": "Boletus chippewaensis", "commonNames": ["Chippewa bolete"], "synonyms": [] },
-        { "id": "boletus-subcaerulescens", "scientificName": "Boletus subcaerulescens", "commonNames": ["Blue-staining king bolete"], "synonyms": [] }
+        {
+          "id": "boletus-edulis",
+          "scientificName": "Boletus edulis",
+          "commonNames": [
+            "King bolete",
+            "Porcino"
+          ],
+          "synonyms": []
+        },
+        {
+          "id": "boletus-rex-veris",
+          "scientificName": "Boletus rex-veris",
+          "commonNames": [
+            "Spring king bolete"
+          ],
+          "synonyms": []
+        },
+        {
+          "id": "boletus-barrowsii",
+          "scientificName": "Boletus barrowsii",
+          "commonNames": [
+            "White king bolete"
+          ],
+          "synonyms": []
+        },
+        {
+          "id": "boletus-regineus",
+          "scientificName": "Boletus regineus",
+          "commonNames": [
+            "Queen bolete"
+          ],
+          "synonyms": []
+        },
+        {
+          "id": "boletus-variipes",
+          "scientificName": "Boletus variipes",
+          "commonNames": [
+            "Variable-stalked bolete"
+          ],
+          "synonyms": []
+        },
+        {
+          "id": "boletus-chippewaensis",
+          "scientificName": "Boletus chippewaensis",
+          "commonNames": [
+            "Chippewa bolete"
+          ],
+          "synonyms": []
+        },
+        {
+          "id": "boletus-subcaerulescens",
+          "scientificName": "Boletus subcaerulescens",
+          "commonNames": [
+            "Blue-staining king bolete"
+          ],
+          "synonyms": []
+        }
       ]
     },
     {
       "id": "chanterelles",
       "name": "Chanterelles",
-      "aliases": ["chanterelle", "cantharellus", "girolle"],
+      "aliases": [
+        "chanterelle",
+        "cantharellus",
+        "girolle"
+      ],
+      "inatTaxa": [
+        "Cantharellus"
+      ],
       "species": [
-        { "id": "cantharellus-formosus", "scientificName": "Cantharellus formosus", "commonNames": ["Pacific golden chanterelle"], "synonyms": [] },
-        { "id": "cantharellus-cascadensis", "scientificName": "Cantharellus cascadensis", "commonNames": ["Cascade chanterelle"], "synonyms": [] },
-        { "id": "cantharellus-roseocanus", "scientificName": "Cantharellus roseocanus", "commonNames": ["Rainbow chanterelle"], "synonyms": [] },
-        { "id": "cantharellus-subalbidus", "scientificName": "Cantharellus subalbidus", "commonNames": ["White chanterelle"], "synonyms": [] },
-        { "id": "cantharellus-californicus", "scientificName": "Cantharellus californicus", "commonNames": ["Mud puppy", "California golden chanterelle"], "synonyms": [] },
-        { "id": "cantharellus-flavus", "scientificName": "Cantharellus flavus", "commonNames": ["Eastern golden chanterelle"], "synonyms": [] },
-        { "id": "cantharellus-phasmatis", "scientificName": "Cantharellus phasmatis", "commonNames": ["Ghost chanterelle"], "synonyms": [] },
-        { "id": "cantharellus-appalachiensis", "scientificName": "Cantharellus appalachiensis", "commonNames": ["Appalachian chanterelle"], "synonyms": [] },
-        { "id": "cantharellus-lateritius", "scientificName": "Cantharellus lateritius", "commonNames": ["Smooth chanterelle"], "synonyms": [] },
-        { "id": "cantharellus-cinnabarinus", "scientificName": "Cantharellus cinnabarinus", "commonNames": ["Cinnabar chanterelle"], "synonyms": [] },
-        { "id": "cantharellus-tenuithrix", "scientificName": "Cantharellus tenuithrix", "commonNames": ["Thin-haired chanterelle"], "synonyms": [] },
-        { "id": "cantharellus-velutinus", "scientificName": "Cantharellus velutinus", "commonNames": ["Velvet chanterelle"], "synonyms": [] },
-        { "id": "cantharellus-cibarius", "scientificName": "Cantharellus cibarius", "commonNames": ["Golden chanterelle", "Girolle"], "synonyms": [] }
+        {
+          "id": "cantharellus-formosus",
+          "scientificName": "Cantharellus formosus",
+          "commonNames": [
+            "Pacific golden chanterelle"
+          ],
+          "synonyms": []
+        },
+        {
+          "id": "cantharellus-cascadensis",
+          "scientificName": "Cantharellus cascadensis",
+          "commonNames": [
+            "Cascade chanterelle"
+          ],
+          "synonyms": []
+        },
+        {
+          "id": "cantharellus-roseocanus",
+          "scientificName": "Cantharellus roseocanus",
+          "commonNames": [
+            "Rainbow chanterelle"
+          ],
+          "synonyms": []
+        },
+        {
+          "id": "cantharellus-subalbidus",
+          "scientificName": "Cantharellus subalbidus",
+          "commonNames": [
+            "White chanterelle"
+          ],
+          "synonyms": []
+        },
+        {
+          "id": "cantharellus-californicus",
+          "scientificName": "Cantharellus californicus",
+          "commonNames": [
+            "Mud puppy",
+            "California golden chanterelle"
+          ],
+          "synonyms": []
+        },
+        {
+          "id": "cantharellus-flavus",
+          "scientificName": "Cantharellus flavus",
+          "commonNames": [
+            "Eastern golden chanterelle"
+          ],
+          "synonyms": []
+        },
+        {
+          "id": "cantharellus-phasmatis",
+          "scientificName": "Cantharellus phasmatis",
+          "commonNames": [
+            "Ghost chanterelle"
+          ],
+          "synonyms": []
+        },
+        {
+          "id": "cantharellus-appalachiensis",
+          "scientificName": "Cantharellus appalachiensis",
+          "commonNames": [
+            "Appalachian chanterelle"
+          ],
+          "synonyms": []
+        },
+        {
+          "id": "cantharellus-lateritius",
+          "scientificName": "Cantharellus lateritius",
+          "commonNames": [
+            "Smooth chanterelle"
+          ],
+          "synonyms": []
+        },
+        {
+          "id": "cantharellus-cinnabarinus",
+          "scientificName": "Cantharellus cinnabarinus",
+          "commonNames": [
+            "Cinnabar chanterelle"
+          ],
+          "synonyms": []
+        },
+        {
+          "id": "cantharellus-tenuithrix",
+          "scientificName": "Cantharellus tenuithrix",
+          "commonNames": [
+            "Thin-haired chanterelle"
+          ],
+          "synonyms": []
+        },
+        {
+          "id": "cantharellus-velutinus",
+          "scientificName": "Cantharellus velutinus",
+          "commonNames": [
+            "Velvet chanterelle"
+          ],
+          "synonyms": []
+        },
+        {
+          "id": "cantharellus-cibarius",
+          "scientificName": "Cantharellus cibarius",
+          "commonNames": [
+            "Golden chanterelle",
+            "Girolle"
+          ],
+          "synonyms": []
+        }
       ]
     },
     {
       "id": "lobster",
       "name": "Lobster mushroom",
-      "aliases": ["lobster", "lobster mushrooms", "hypomyces"],
+      "aliases": [
+        "lobster",
+        "lobster mushrooms",
+        "hypomyces"
+      ],
+      "inatTaxa": [
+        "Hypomyces lactifluorum"
+      ],
       "species": [
-        { "id": "hypomyces-lactifluorum", "scientificName": "Hypomyces lactifluorum", "commonNames": ["Lobster mushroom"], "synonyms": [] }
+        {
+          "id": "hypomyces-lactifluorum",
+          "scientificName": "Hypomyces lactifluorum",
+          "commonNames": [
+            "Lobster mushroom"
+          ],
+          "synonyms": []
+        }
       ]
     },
     {
       "id": "cauliflower",
       "name": "Cauliflower mushrooms",
-      "aliases": ["cauliflower mushroom", "cauliflower", "sparassis"],
+      "aliases": [
+        "cauliflower mushroom",
+        "cauliflower",
+        "sparassis"
+      ],
+      "inatTaxa": [
+        "Sparassis"
+      ],
       "species": [
-        { "id": "sparassis-radicata", "scientificName": "Sparassis radicata", "commonNames": ["Western cauliflower mushroom"], "synonyms": [] },
-        { "id": "sparassis-americana", "scientificName": "Sparassis americana", "commonNames": ["Eastern cauliflower mushroom"], "synonyms": [] },
-        { "id": "sparassis-spathulata", "scientificName": "Sparassis spathulata", "commonNames": ["Oak cauliflower mushroom"], "synonyms": ["Sparassis herbstii"] },
-        { "id": "sparassis-crispa", "scientificName": "Sparassis crispa", "commonNames": ["Wood cauliflower"], "synonyms": [] }
+        {
+          "id": "sparassis-radicata",
+          "scientificName": "Sparassis radicata",
+          "commonNames": [
+            "Western cauliflower mushroom"
+          ],
+          "synonyms": []
+        },
+        {
+          "id": "sparassis-americana",
+          "scientificName": "Sparassis americana",
+          "commonNames": [
+            "Eastern cauliflower mushroom"
+          ],
+          "synonyms": []
+        },
+        {
+          "id": "sparassis-spathulata",
+          "scientificName": "Sparassis spathulata",
+          "commonNames": [
+            "Oak cauliflower mushroom"
+          ],
+          "synonyms": [
+            "Sparassis herbstii"
+          ]
+        },
+        {
+          "id": "sparassis-crispa",
+          "scientificName": "Sparassis crispa",
+          "commonNames": [
+            "Wood cauliflower"
+          ],
+          "synonyms": []
+        }
       ]
     },
     {
       "id": "psilocybe",
       "name": "Psilocybe",
-      "aliases": ["psilocybin mushrooms", "magic mushrooms", "liberty cap"],
+      "aliases": [
+        "psilocybin mushrooms",
+        "magic mushrooms",
+        "liberty cap"
+      ],
+      "inatTaxa": [
+        "Psilocybe"
+      ],
       "legalNote": true,
       "species": [
-        { "id": "psilocybe-cyanescens", "scientificName": "Psilocybe cyanescens", "commonNames": ["Wavy cap"], "synonyms": [] },
-        { "id": "psilocybe-azurescens", "scientificName": "Psilocybe azurescens", "commonNames": ["Flying saucer mushroom"], "synonyms": [] },
-        { "id": "psilocybe-allenii", "scientificName": "Psilocybe allenii", "commonNames": ["Allen's psilocybe"], "synonyms": [] },
-        { "id": "psilocybe-stuntzii", "scientificName": "Psilocybe stuntzii", "commonNames": ["Blue ringer"], "synonyms": [] },
-        { "id": "psilocybe-semilanceata", "scientificName": "Psilocybe semilanceata", "commonNames": ["Liberty cap"], "synonyms": [] },
-        { "id": "psilocybe-ovoideocystidiata", "scientificName": "Psilocybe ovoideocystidiata", "commonNames": ["Ovoid"], "synonyms": [] },
-        { "id": "psilocybe-caerulipes", "scientificName": "Psilocybe caerulipes", "commonNames": ["Blue foot"], "synonyms": [] },
-        { "id": "psilocybe-cubensis", "scientificName": "Psilocybe cubensis", "commonNames": ["Golden teacher"], "synonyms": [] }
+        {
+          "id": "psilocybe-cyanescens",
+          "scientificName": "Psilocybe cyanescens",
+          "commonNames": [
+            "Wavy cap"
+          ],
+          "synonyms": []
+        },
+        {
+          "id": "psilocybe-azurescens",
+          "scientificName": "Psilocybe azurescens",
+          "commonNames": [
+            "Flying saucer mushroom"
+          ],
+          "synonyms": []
+        },
+        {
+          "id": "psilocybe-allenii",
+          "scientificName": "Psilocybe allenii",
+          "commonNames": [
+            "Allen's psilocybe"
+          ],
+          "synonyms": []
+        },
+        {
+          "id": "psilocybe-stuntzii",
+          "scientificName": "Psilocybe stuntzii",
+          "commonNames": [
+            "Blue ringer"
+          ],
+          "synonyms": []
+        },
+        {
+          "id": "psilocybe-semilanceata",
+          "scientificName": "Psilocybe semilanceata",
+          "commonNames": [
+            "Liberty cap"
+          ],
+          "synonyms": []
+        },
+        {
+          "id": "psilocybe-ovoideocystidiata",
+          "scientificName": "Psilocybe ovoideocystidiata",
+          "commonNames": [
+            "Ovoid"
+          ],
+          "synonyms": []
+        },
+        {
+          "id": "psilocybe-caerulipes",
+          "scientificName": "Psilocybe caerulipes",
+          "commonNames": [
+            "Blue foot"
+          ],
+          "synonyms": []
+        },
+        {
+          "id": "psilocybe-cubensis",
+          "scientificName": "Psilocybe cubensis",
+          "commonNames": [
+            "Golden teacher"
+          ],
+          "synonyms": []
+        }
       ]
     },
     {
       "id": "blewits",
       "name": "Blewits",
-      "aliases": ["blewit", "blewitt", "blewitts", "wood blewit", "lepista"],
+      "aliases": [
+        "blewit",
+        "blewitt",
+        "blewitts",
+        "wood blewit",
+        "lepista"
+      ],
+      "inatTaxa": [
+        "Collybia nuda",
+        "Lepista nuda",
+        "Lepista personata"
+      ],
       "species": [
-        { "id": "collybia-nuda", "scientificName": "Collybia nuda", "commonNames": ["Wood blewit", "Blewit"], "synonyms": ["Lepista nuda", "Clitocybe nuda"] },
-        { "id": "lepista-personata", "scientificName": "Lepista personata", "commonNames": ["Field blewit"], "synonyms": ["Lepista saeva", "Collybia personata"] }
+        {
+          "id": "collybia-nuda",
+          "scientificName": "Collybia nuda",
+          "commonNames": [
+            "Wood blewit",
+            "Blewit"
+          ],
+          "synonyms": [
+            "Lepista nuda",
+            "Clitocybe nuda"
+          ]
+        },
+        {
+          "id": "lepista-personata",
+          "scientificName": "Lepista personata",
+          "commonNames": [
+            "Field blewit"
+          ],
+          "synonyms": [
+            "Lepista saeva",
+            "Collybia personata"
+          ]
+        }
       ]
     }
   ],
   "trees": [
-    "Douglas-fir", "Western hemlock", "Mountain hemlock", "Sitka spruce", "Engelmann spruce",
-    "Western redcedar", "Ponderosa pine", "Lodgepole pine", "Shore pine", "Western white pine",
-    "Grand fir", "Noble fir", "Pacific silver fir", "Subalpine fir", "White fir", "Western larch",
-    "Oregon white oak", "Tanoak", "Live oak", "Bigleaf maple", "Red alder", "Black cottonwood",
-    "Quaking aspen", "Pacific madrone", "Paper birch", "Ash", "Elm", "Apple", "Beech"
+    "Douglas-fir",
+    "Western hemlock",
+    "Mountain hemlock",
+    "Sitka spruce",
+    "Engelmann spruce",
+    "Western redcedar",
+    "Ponderosa pine",
+    "Lodgepole pine",
+    "Shore pine",
+    "Western white pine",
+    "Grand fir",
+    "Noble fir",
+    "Pacific silver fir",
+    "Subalpine fir",
+    "White fir",
+    "Western larch",
+    "Oregon white oak",
+    "Tanoak",
+    "Live oak",
+    "Bigleaf maple",
+    "Red alder",
+    "Black cottonwood",
+    "Quaking aspen",
+    "Pacific madrone",
+    "Paper birch",
+    "Ash",
+    "Elm",
+    "Apple",
+    "Beech"
   ]
 }

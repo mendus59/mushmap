@@ -7,8 +7,9 @@ A mushroom foraging journal and heat map for Washington and Oregon, hosted on Gi
   Pick a tracked species or group (searching "morels" lists every *Morchella*), or enter your own name.
   Add notes on cluster size, trees and plants nearby, substrate and habitat. Search finds by date range,
   species or group, text, map area or distance, as a list or on a map.
-- **Heat map.** Coming next: weekly likelihood scores per species from host trees, season, elevation,
-  weather and past sightings, kept up to date by scheduled GitHub Actions jobs.
+- **Heat map.** A weekly likelihood map per species or group over Washington and Oregon. Version 1 uses the
+  weeks and elevations of research-grade iNaturalist sightings and how close past sightings are; host trees and
+  weather come next.
 
 ## Stack
 
@@ -29,6 +30,23 @@ A mushroom foraging journal and heat map for Washington and Oregon, hosted on Gi
    and publish (or run `firebase deploy --only firestore:rules` with the Firebase CLI).
 5. **Project settings → Your apps:** add a web app and paste its config object into `src/firebase-config.ts`.
    These values are public identifiers, not secrets.
+
+## Heat map data
+
+`pipeline/` (Python) builds the data and `.github/workflows/data.yml` runs it every Monday, or on demand from
+the Actions tab:
+
+1. On first run, builds an H3 resolution 7 grid (about 5 km² cells) over Washington and Oregon from Census
+   state boundaries and looks up each cell's elevation (Open-Meteo).
+2. Fetches new research-grade, unobscured iNaturalist sightings for each group's `inatTaxa` and looks up
+   their elevations.
+3. Writes a model per group, and per species with at least 25 sightings: a smoothed week-by-elevation table
+   and a past-sightings density per cell.
+4. Force-pushes the results as a single commit to the `data` branch and redeploys the site, which copies
+   `cells.json` and `model/` into `data/generated/`. The browser combines them for the chosen week
+   (`src/heatmapModel.ts`).
+
+Run it locally with `pip install -r pipeline/requirements.txt && python pipeline/run.py --data generated`.
 
 ## Development
 

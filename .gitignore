@@ -2,3 +2,7 @@ node_modules
 dist
 .firebase
 *.log
+public/data/generated
+__pycache__/
+.pytest_cache/
+generated/
