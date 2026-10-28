@@ -20,7 +20,33 @@ export interface Model {
   hostFloor?: number;
   hostIdx?: number[];
   hostVal?: number[];
+  weather?: WeatherModel;
 }
+
+/** How much more often finds follow given recent weather than usual (pipeline/weather.py). */
+export interface WeatherModel {
+  /** Lift is held between min and max before it multiplies the score. */
+  min: number;
+  max: number;
+  /** Precipitation bins are log(1 + mm) / pStep; temperature bins are whole °C from tMin. */
+  pStep: number;
+  tMin: number;
+  count: number;
+  /** [precipitation bin][temperature bin] → lift in percent (100 = usual). */
+  table: number[][];
+}
+
+/** Recent weather per grid cell, aligned with Grid.cells. */
+export interface CurrentWeather {
+  asOf: string;
+  pDays: number;
+  tDays: number;
+  p14: (number | null)[];
+  t7: (number | null)[];
+}
+
+/** Recent weather speaks to fruiting over the next couple of weeks, so it applies to those weeks only. */
+export const WEATHER_WEEKS_AHEAD = 2;
 
 export interface ModelEntry {
   id: string;
@@ -43,6 +69,8 @@ export interface CellScore {
   history: number;
   /** 0..1 host-tree score, or null when the model has no host gate. */
   host: number | null;
+  /** Weather multiplier (1 = usual), or null when weather does not apply. */
+  weather: number | null;
 }
 
 export const MIN_SCORE = 0.08;
@@ -63,7 +91,27 @@ export function weekStart(year: number, week: number): Date {
   return monday;
 }
 
-export function scoreCells(grid: Grid, model: Model, week: number, minScore = MIN_SCORE): CellScore[] {
+/** Whether recent weather (measured up to asOf) applies to this week of the year. */
+export function weatherApplies(current: CurrentWeather | null | undefined, week: number): boolean {
+  if (!current) return false;
+  const from = isoWeek(new Date(`${current.asOf}T12:00:00`));
+  return (week - from + 53) % 53 <= WEATHER_WEEKS_AHEAD;
+}
+
+export function weatherLift(w: WeatherModel, p14: number | null | undefined, t7: number | null | undefined): number | null {
+  if (p14 === null || p14 === undefined || t7 === null || t7 === undefined) return null;
+  const pBins = w.table.length;
+  const tBins = w.table[0]?.length ?? 0;
+  const pb = Math.max(0, Math.min(pBins - 1, Math.round(Math.log1p(Math.max(p14, 0)) / w.pStep)));
+  const tb = Math.max(0, Math.min(tBins - 1, Math.round(t7) - w.tMin));
+  const lift = (w.table[pb]?.[tb] ?? 100) / 100;
+  return Math.max(w.min, Math.min(w.max, lift));
+}
+
+/** Pass `current` only for weeks where weatherApplies(). */
+export function scoreCells(
+  grid: Grid, model: Model, week: number, minScore = MIN_SCORE, current: CurrentWeather | null = null,
+): CellScore[] {
   const row = model.seasonElev[week - 1] ?? [];
   const bins = row.length;
   const history = new Map<number, number>();
@@ -82,8 +130,10 @@ export function scoreCells(grid: Grid, model: Model, week: number, minScore = MI
     if (season === 0) continue;
     const h = history.get(i) ?? 0;
     const t = hasHost ? host.get(i) ?? 0 : null;
-    const score = season * (floor + (1 - floor) * h) * (t === null ? 1 : hostFloor + (1 - hostFloor) * t);
-    if (score >= minScore) out.push({ index: i, score, season, history: h, host: t });
+    const w = current && model.weather ? weatherLift(model.weather, current.p14[i], current.t7[i]) : null;
+    const score = Math.min(1,
+      season * (floor + (1 - floor) * h) * (t === null ? 1 : hostFloor + (1 - hostFloor) * t) * (w ?? 1));
+    if (score >= minScore) out.push({ index: i, score, season, history: h, host: t, weather: w });
   }
   return out;
 }

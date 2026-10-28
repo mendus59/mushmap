@@ -8,8 +8,9 @@ A mushroom foraging journal and heat map for Washington and Oregon, hosted on Gi
   Add notes on cluster size, trees and plants nearby, substrate and habitat. Search finds by date range,
   species or group, text, map area or distance, as a list or on a map.
 - **Heat map.** A weekly likelihood map per species or group over Washington and Oregon. It uses the
-  weeks and elevations of research-grade iNaturalist sightings, how close past sightings are, and how much of
-  each mushroom's host trees grow in the cell; weather comes next.
+  weeks and elevations of research-grade iNaturalist sightings, how close past sightings are, how much of
+  each mushroom's host trees grow in the cell, and, for the coming weeks, how this year's recent rain and
+  temperature compare with the weather before past finds.
 
 ## Stack
 
@@ -45,8 +46,13 @@ the Actions tab:
 3. Writes a model per group, and per species with at least 25 sightings: a smoothed week-by-elevation table,
    a past-sightings density per cell and a host-tree score per cell. `hostFloor` sets how much a cell with
    none of the host trees still counts (1 means no host gate, as for wood-chip Psilocybe).
+   Each model also gets a weather table from NOAA GHCN-Daily station records (free on AWS, about 3 GB of
+   yearly files since 2008, reloaded each run): 14-day rain and 7-day mean temperature before each
+   sighting, compared with the same place and date in every other year. `weather/current.json` holds the
+   latest 14-day rain and 7-day temperature per cell; the browser applies it to the measured week and the
+   two after.
 4. Force-pushes the results as a single commit to the `data` branch and redeploys the site, which copies
-   `cells.json` and `model/` into `data/generated/`. The browser combines them for the chosen week
+   `cells.json`, `model/` and `weather/` into `data/generated/`. The browser combines them for the chosen week
    (`src/heatmapModel.ts`).
 
 Run it locally with `pip install -r pipeline/requirements.txt && python pipeline/run.py --data generated`.

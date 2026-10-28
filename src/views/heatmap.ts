@@ -2,7 +2,8 @@ import { cellToBoundary } from 'h3-js';
 import type { GeoJSONSource, Map as MapLibreMap } from 'maplibre-gl';
 import { h, clear } from '../dom';
 import {
-  isoWeek, scoreCells, weekStart, type CellScore, type Grid, type Model, type ModelIndex,
+  isoWeek, scoreCells, weatherApplies, weekStart,
+  type CellScore, type CurrentWeather, type Grid, type Model, type ModelIndex,
 } from '../heatmapModel';
 import { SAFETY_NOTE, legalNoteEl } from '../legal';
 import { createMap, maplibregl } from '../map';
@@ -26,6 +27,16 @@ function weekLabel(week: number): string {
   return `Week ${week}: ${fmt(start)} to ${fmt(end)}`;
 }
 
+function shortDate(iso: string): string {
+  return new Date(`${iso}T12:00:00`).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+}
+
+function weatherWords(lift: number): string {
+  if (lift >= 1.2) return `better than usual for finds, ×${lift.toFixed(1)}`;
+  if (lift <= 0.8) return `worse than usual for finds, ×${lift.toFixed(1)}`;
+  return 'about usual for finds';
+}
+
 export function heatmapView(catalog: Catalog): HTMLElement {
   const status = h('p', { class: 'muted' }, 'Loading heat map data…');
   const select = h('select', { 'aria-label': 'Species or group' });
@@ -37,6 +48,7 @@ export function heatmapView(catalog: Catalog): HTMLElement {
 
   let grid: Grid | null = null;
   let model: Model | null = null;
+  let current: CurrentWeather | null = null;
   let scores: CellScore[] = [];
   const models = new Map<string, Promise<Model | null>>();
   const boundaries = new Map<number, [number, number][]>();
@@ -54,7 +66,8 @@ export function heatmapView(catalog: Catalog): HTMLElement {
   const draw = () => {
     weekText.textContent = weekLabel(Number(week.value));
     if (!grid || !model) return;
-    scores = scoreCells(grid, model, Number(week.value));
+    const withWeather = weatherApplies(current, Number(week.value)) && !!model.weather;
+    scores = scoreCells(grid, model, Number(week.value), undefined, withWeather ? current : null);
     const source = map.getSource('cells') as GeoJSONSource | undefined;
     source?.setData({
       type: 'FeatureCollection',
@@ -65,9 +78,12 @@ export function heatmapView(catalog: Catalog): HTMLElement {
         properties: { score: s.score, i },
       })),
     });
-    status.textContent = scores.length
+    const weatherNote = withWeather
+      ? ` Includes weather up to ${shortDate(current!.asOf)}.`
+      : current ? ' Weather only counts for the next few weeks.' : '';
+    status.textContent = (scores.length
       ? `${scores.length.toLocaleString()} cells with some chance this week, from ${model.count.toLocaleString()} iNaturalist sightings.`
-      : 'Out of season this week: no recorded sightings at this time of year.';
+      : 'Out of season this week: no recorded sightings at this time of year.') + weatherNote;
   };
 
   const loadModel = async (id: string) => {
@@ -104,6 +120,9 @@ export function heatmapView(catalog: Catalog): HTMLElement {
           `Season and elevation fit: ${Math.round(s.season * 100)}%<br>` +
           `Past sightings nearby: ${Math.round(s.history * 100)}%<br>` +
           (s.host === null ? '' : `Host trees: ${Math.round(s.host * 100)}%<br>`) +
+          (s.weather === null || !current ? '' :
+            `Recent weather: ${current.p14[s.index]} mm rain in ${current.pDays} days, ` +
+            `${current.t7[s.index]} °C average over ${current.tDays} (${weatherWords(s.weather)})<br>`) +
           `Elevation: ${grid.elev[s.index]} m`,
         )
         .addTo(map);
@@ -115,7 +134,11 @@ export function heatmapView(catalog: Catalog): HTMLElement {
 
   (async () => {
     try {
-      const [index, g] = await Promise.all([getJson<ModelIndex>('model/index.json'), getJson<Grid>('cells.json')]);
+      const [index, g, w] = await Promise.all([
+        getJson<ModelIndex>('model/index.json'), getJson<Grid>('cells.json'),
+        getJson<CurrentWeather>('weather/current.json').catch(() => null),
+      ]);
+      current = w;
       if (!index || !g || !index.models.length) {
         status.textContent = 'The heat map data has not been generated yet. It appears after the first weekly data run.';
         return;
@@ -153,7 +176,9 @@ export function heatmapView(catalog: Catalog): HTMLElement {
       h('p', { class: 'muted' },
         'Each cell is scored from the weeks and elevations where research-grade iNaturalist sightings ' +
         'in Washington and Oregon were made, how close past sightings are, and how much of the ' +
-        'mushroom\'s host trees grow there (USDA Forest Service tree maps). Recent weather is coming next. ' +
+        'mushroom\'s host trees grow there (USDA Forest Service tree maps). For this week and the next two, ' +
+        'it also compares the last 14 days of rain and 7 days of temperature (NOAA weather stations) with ' +
+        'the weather before past finds at the same time of year. ' +
         'Many areas are private land or closed to harvest; check before you forage.'),
       h('p', { class: 'note' }, SAFETY_NOTE)),
   );

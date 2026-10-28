@@ -32,8 +32,10 @@ jobs:
           if git ls-remote --exit-code --heads origin data >/dev/null; then
             git fetch --depth 1 origin data
             mkdir -p public/data/generated
-            # Raw sightings stay on the data branch; the site only needs the grid and models.
-            git archive FETCH_HEAD cells.json model | tar -x -C public/data/generated
+            # Raw sightings stay on the data branch; the site only needs the grid, models and recent weather.
+            paths="cells.json model"
+            if git cat-file -e FETCH_HEAD:weather 2>/dev/null; then paths="$paths weather"; fi
+            git archive FETCH_HEAD $paths | tar -x -C public/data/generated
           else
             echo "No data branch yet; the heat map will say data is not generated."
           fi
