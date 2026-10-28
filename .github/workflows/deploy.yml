@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
+  # Also run by the data workflow after it publishes new heat map data.
   workflow_dispatch:
 
 permissions:
@@ -26,6 +27,16 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm test
+      - name: Add heat map data from the data branch
+        run: |
+          if git ls-remote --exit-code --heads origin data >/dev/null; then
+            git fetch --depth 1 origin data
+            mkdir -p public/data/generated
+            # Raw sightings stay on the data branch; the site only needs the grid and models.
+            git archive FETCH_HEAD cells.json model | tar -x -C public/data/generated
+          else
+            echo "No data branch yet; the heat map will say data is not generated."
+          fi
       - run: npm run build
       - uses: actions/upload-pages-artifact@v3
         if: github.event_name != 'pull_request'

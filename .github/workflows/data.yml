@@ -1,0 +1,69 @@
+name: Update heat map data
+
+on:
+  schedule:
+    - cron: '0 9 * * 1' # Mondays 09:00 UTC (1 or 2 a.m. Pacific)
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: Publish to the data branch and redeploy the site
+        type: boolean
+        default: true
+      groups:
+        description: Only these group ids, comma separated (blank for all)
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: heatmap-data
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: pipeline/requirements.txt
+      - run: pip install -r pipeline/requirements.txt
+      - run: python -m pytest -q pipeline/tests
+
+      - name: Get current data
+        run: |
+          mkdir -p generated
+          if git ls-remote --exit-code --heads origin data >/dev/null; then
+            git fetch --depth 1 origin data
+            git archive FETCH_HEAD | tar -x -C generated
+          fi
+
+      - name: Run pipeline
+        env:
+          GROUPS: ${{ inputs.groups }}
+        run: |
+          args=(--data generated)
+          if [ -n "$GROUPS" ]; then args+=(--groups "$GROUPS"); fi
+          python pipeline/run.py "${args[@]}"
+          du -sh generated generated/*
+
+      - name: Publish to data branch
+        if: github.event_name == 'schedule' || inputs.publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cd generated
+          git init -q -b data
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -q -m "Heat map data $(date -u +%Y-%m-%d)"
+          # One snapshot commit, replaced each run, so history does not grow.
+          git push --force "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" data
+          gh workflow run deploy.yml --repo "${{ github.repository }}" --ref main
