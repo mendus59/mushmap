@@ -13,6 +13,10 @@ on:
         description: Only these group ids, comma separated (blank for all)
         required: false
         default: ''
+      only_trails:
+        description: Rebuild the trail data and nothing else
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -47,9 +51,11 @@ jobs:
       - name: Run pipeline
         env:
           GROUPS: ${{ inputs.groups }}
+          ONLY_TRAILS: ${{ inputs.only_trails }}
         run: |
           args=(--data generated)
           if [ -n "$GROUPS" ]; then args+=(--groups "$GROUPS"); fi
+          if [ "$ONLY_TRAILS" = "true" ]; then args+=(--only-trails); fi
           python pipeline/run.py "${args[@]}"
           du -sh generated generated/*
 
