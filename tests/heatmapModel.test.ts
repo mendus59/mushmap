@@ -20,6 +20,15 @@ describe('scoreCells', () => {
     expect(byIndex.has(3)).toBe(false);                // no elevation known
   });
 
+  it('gates by host trees when the model has them', () => {
+    const m = { ...model(), hostFloor: 0.2, hostIdx: [2], hostVal: [50] };
+    const byIndex = new Map(scoreCells(grid, m, 18, 0).map((s) => [s.index, s]));
+    expect(byIndex.get(0)?.score).toBeCloseTo(0.2);    // known spot, no host trees
+    expect(byIndex.get(2)?.score).toBeCloseTo(0.15);   // 0.25 history floor × (0.2 + 0.8 × 0.5)
+    expect(byIndex.get(2)?.host).toBe(0.5);
+    expect(scoreCells(grid, model(), 18, 0)[0].host).toBeNull();
+  });
+
   it('drops cells below the threshold and out-of-season weeks', () => {
     expect(scoreCells(grid, model(), 18, 0.2).map((s) => s.index)).toEqual([0, 2]);
     expect(scoreCells(grid, model(), 30)).toEqual([]);

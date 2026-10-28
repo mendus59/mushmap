@@ -12,6 +12,54 @@
       "inatTaxa": [
         "Morchella"
       ],
+      "hostFloor": 0.4,
+      "hostTrees": [
+        {
+          "fia": 122,
+          "name": "Ponderosa pine",
+          "weight": 1
+        },
+        {
+          "fia": 202,
+          "name": "Douglas-fir",
+          "weight": 1
+        },
+        {
+          "fia": 17,
+          "name": "Grand fir",
+          "weight": 1
+        },
+        {
+          "fia": 15,
+          "name": "White fir",
+          "weight": 0.8
+        },
+        {
+          "fia": 73,
+          "name": "Western larch",
+          "weight": 1
+        },
+        {
+          "fia": 108,
+          "name": "Lodgepole pine",
+          "weight": 0.6
+        },
+        {
+          "fia": 93,
+          "name": "Engelmann spruce",
+          "weight": 0.5
+        },
+        {
+          "fia": 747,
+          "name": "Black cottonwood",
+          "weight": 1
+        },
+        {
+          "fia": 746,
+          "name": "Quaking aspen",
+          "weight": 0.6
+        }
+      ],
       "species": [
         {
           "id": "morchella-americana",
@@ -120,6 +168,69 @@
         "Boletus chippewaensis",
         "Boletus subcaerulescens"
       ],
+      "hostFloor": 0.15,
+      "hostTrees": [
+        {
+          "fia": 98,
+          "name": "Sitka spruce",
+          "weight": 1
+        },
+        {
+          "fia": 108,
+          "name": "Lodgepole pine",
+          "weight": 1
+        },
+        {
+          "fia": 122,
+          "name": "Ponderosa pine",
+          "weight": 0.8
+        },
+        {
+          "fia": 93,
+          "name": "Engelmann spruce",
+          "weight": 0.8
+        },
+        {
+          "fia": 19,
+          "name": "Subalpine fir",
+          "weight": 0.6
+        },
+        {
+          "fia": 11,
+          "name": "Pacific silver fir",
+          "weight": 0.6
+        },
+        {
+          "fia": 264,
+          "name": "Mountain hemlock",
+          "weight": 0.6
+        },
+        {
+          "fia": 15,
+          "name": "White fir",
+          "weight": 0.6
+        },
+        {
+          "fia": 202,
+          "name": "Douglas-fir",
+          "weight": 0.6
+        },
+        {
+          "fia": 17,
+          "name": "Grand fir",
+          "weight": 0.5
+        },
+        {
+          "fia": 22,
+          "name": "Noble fir",
+          "weight": 0.5
+        },
+        {
+          "fia": 263,
+          "name": "Western hemlock",
+          "weight": 0.4
+        }
+      ],
       "species": [
         {
           "id": "boletus-edulis",
@@ -190,6 +301,54 @@
       ],
       "inatTaxa": [
         "Cantharellus"
+      ],
+      "hostFloor": 0.1,
+      "hostTrees": [
+        {
+          "fia": 202,
+          "name": "Douglas-fir",
+          "weight": 1
+        },
+        {
+          "fia": 263,
+          "name": "Western hemlock",
+          "weight": 1
+        },
+        {
+          "fia": 98,
+          "name": "Sitka spruce",
+          "weight": 0.6
+        },
+        {
+          "fia": 631,
+          "name": "Tanoak",
+          "weight": 0.6
+        },
+        {
+          "fia": 11,
+          "name": "Pacific silver fir",
+          "weight": 0.5
+        },
+        {
+          "fia": 815,
+          "name": "Oregon white oak",
+          "weight": 0.5
+        },
+        {
+          "fia": 17,
+          "name": "Grand fir",
+          "weight": 0.4
+        },
+        {
+          "fia": 22,
+          "name": "Noble fir",
+          "weight": 0.4
+        },
+        {
+          "fia": 361,
+          "name": "Pacific madrone",
+          "weight": 0.3
+        }
       ],
       "species": [
         {
@@ -311,6 +470,54 @@
       "inatTaxa": [
         "Hypomyces lactifluorum"
       ],
+      "hostFloor": 0.15,
+      "hostTrees": [
+        {
+          "fia": 202,
+          "name": "Douglas-fir",
+          "weight": 1
+        },
+        {
+          "fia": 263,
+          "name": "Western hemlock",
+          "weight": 0.8
+        },
+        {
+          "fia": 17,
+          "name": "Grand fir",
+          "weight": 0.6
+        },
+        {
+          "fia": 11,
+          "name": "Pacific silver fir",
+          "weight": 0.6
+        },
+        {
+          "fia": 22,
+          "name": "Noble fir",
+          "weight": 0.5
+        },
+        {
+          "fia": 98,
+          "name": "Sitka spruce",
+          "weight": 0.5
+        },
+        {
+          "fia": 19,
+          "name": "Subalpine fir",
+          "weight": 0.5
+        },
+        {
+          "fia": 264,
+          "name": "Mountain hemlock",
+          "weight": 0.5
+        },
+        {
+          "fia": 93,
+          "name": "Engelmann spruce",
+          "weight": 0.5
+        }
+      ],
       "species": [
         {
           "id": "hypomyces-lactifluorum",
@@ -332,6 +539,44 @@
       ],
       "inatTaxa": [
         "Sparassis"
+      ],
+      "hostFloor": 0.1,
+      "hostTrees": [
+        {
+          "fia": 202,
+          "name": "Douglas-fir",
+          "weight": 1
+        },
+        {
+          "fia": 122,
+          "name": "Ponderosa pine",
+          "weight": 0.8
+        },
+        {
+          "fia": 117,
+          "name": "Sugar pine",
+          "weight": 0.6
+        },
+        {
+          "fia": 119,
+          "name": "Western white pine",
+          "weight": 0.6
+        },
+        {
+          "fia": 108,
+          "name": "Lodgepole pine",
+          "weight": 0.5
+        },
+        {
+          "fia": 17,
+          "name": "Grand fir",
+          "weight": 0.4
+        },
+        {
+          "fia": 263,
+          "name": "Western hemlock",
+          "weight": 0.4
+        }
       ],
       "species": [
         {
@@ -382,6 +627,8 @@
         "Psilocybe"
       ],
       "legalNote": true,
+      "hostFloor": 1.0,
+      "hostTrees": [],
       "species": [
         {
           "id": "psilocybe-cyanescens",
@@ -464,6 +711,39 @@
         "Lepista nuda",
         "Lepista personata",
         "Collybia personata"
+      ],
+      "hostFloor": 0.5,
+      "hostTrees": [
+        {
+          "fia": 202,
+          "name": "Douglas-fir",
+          "weight": 0.6
+        },
+        {
+          "fia": 312,
+          "name": "Bigleaf maple",
+          "weight": 0.6
+        },
+        {
+          "fia": 351,
+          "name": "Red alder",
+          "weight": 0.6
+        },
+        {
+          "fia": 242,
+          "name": "Western redcedar",
+          "weight": 0.5
+        },
+        {
+          "fia": 747,
+          "name": "Black cottonwood",
+          "weight": 0.5
+        },
+        {
+          "fia": 815,
+          "name": "Oregon white oak",
+          "weight": 0.5
+        }
       ],
       "species": [
         {
