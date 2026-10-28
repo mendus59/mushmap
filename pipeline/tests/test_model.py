@@ -99,3 +99,48 @@ def test_tile_position_and_terrarium_decoding():
     assert 0 <= px < 256 and 0 <= py < 256
     assert decode_terrarium(128, 0, 0) == 0
     assert decode_terrarium(129, 44, 0) == 300
+
+
+def test_resolve_taxon_id_picks_exact_fungus(monkeypatch):
+    import observations
+    monkeypatch.setattr(observations.time, "sleep", lambda s: None)
+    monkeypatch.setattr(observations, "http_json", lambda url, params: {"results": [
+        {"id": 1, "name": "Morchella esculenta", "iconic_taxon_name": "Fungi"},
+        {"id": 2, "name": "Morchella", "iconic_taxon_name": "Plantae"},
+        {"id": 3, "name": "Morchella", "iconic_taxon_name": "Fungi"},
+    ]})
+    assert observations.resolve_taxon_id("Morchella") == 3
+
+
+def test_update_group_resets_old_store_versions(monkeypatch):
+    import observations
+    monkeypatch.setattr(observations, "resolve_taxon_id", lambda name: 42)
+    calls = []
+
+    def fake_fetch(taxon_id, id_above):
+        calls.append((taxon_id, id_above))
+        return [[10, "2025-05-01", 45.0, -122.0, "Morchella snyderi"]], 10
+
+    monkeypatch.setattr(observations, "fetch_new", fake_fetch)
+    old = {"cursor": {"Morchella": 999}, "obs": [[5, "2024-05-01", 45.0, -122.0, "Verpa bohemica", 100]]}
+    store = observations.update_group(old, ["Morchella"])
+    assert calls == [(42, 0)]
+    assert [r[4] for r in store["obs"]] == ["Morchella snyderi"]
+    assert store["version"] == observations.STORE_VERSION
+    # A second run continues from the cursor.
+    observations.update_group(store, ["Morchella"])
+    assert calls[-1] == (42, 10)
+
+
+def test_update_group_skips_unknown_names(monkeypatch):
+    import observations
+
+    def resolve(name):
+        if name == "Lepista nuda":
+            raise RuntimeError("No active iNaturalist taxon named 'Lepista nuda'")
+        return 7
+
+    monkeypatch.setattr(observations, "resolve_taxon_id", resolve)
+    monkeypatch.setattr(observations, "fetch_new", lambda taxon_id, id_above: ([], id_above))
+    store = observations.update_group(None, ["Collybia nuda", "Lepista nuda"])
+    assert store["taxonIds"] == {"Collybia nuda": 7}
