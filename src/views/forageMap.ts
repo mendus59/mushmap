@@ -9,7 +9,7 @@ import {
 import { SAFETY_NOTE, groupNotes } from '../legal';
 import { fillModelSelect, getJson, shortDate, weekLabel } from '../generated';
 import { BASE_MAPS, addBaseMaps, createMap, maplibregl, setBaseMap, type BaseMap } from '../map';
-import { expandSpeciesId, type Catalog } from '../species';
+import { describeSpeciesId, expandSpeciesId, type Catalog } from '../species';
 import {
   accessLabel, areaPublicLand, decodePolyline, describeAccess, detectPlatform, navigationLinks, nearestEnd,
   rankTrails, type Bounds, type RankedTrail, type Trail, type TrailData,
@@ -298,14 +298,14 @@ export function forageMapView(catalog: Catalog, uid: string): HTMLElement {
     });
     clear(results);
     if (selected !== null && !ranked.some((r) => r.index === selected)) openPopup?.remove();
-    const label = select.selectedOptions[0]?.textContent?.replace(/ \(.*\)$/, '') ?? 'this mushroom';
+    const label = describeSpeciesId(catalog, select.value)?.label ?? 'this mushroom';
     if (!ranked.length) {
       const land = areaPublicLand(trailData!.cellLand, centres, b);
-      resultsNote.textContent = `No trails here with any chance of ${label.toLowerCase()} in ${weekLabel(Number(week.value)).toLowerCase()}.` +
+      resultsNote.textContent = `No trails here with any chance of ${label} in ${weekLabel(Number(week.value)).toLowerCase()}.` +
         (land !== null && land < 20 ? ' Most of this area is private or closed land, so access is very low.' : '');
       return;
     }
-    resultsNote.textContent = `Top ${ranked.length} trails for ${label.toLowerCase()}, ${weekLabel(Number(week.value)).toLowerCase()}. ` +
+    resultsNote.textContent = `Top ${ranked.length} trails for ${label}, ${weekLabel(Number(week.value)).toLowerCase()}. ` +
       'Overall combines the chance along the trail with its accessibility.';
     ranked.forEach((r) => {
       const t = r.trail;

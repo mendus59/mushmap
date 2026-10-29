@@ -34,7 +34,16 @@ describe('searchSpecies', () => {
     const results = searchSpecies(catalog, 'Morels');
     expect(results[0]).toMatchObject({ kind: 'group', id: 'morels' });
     const names = results.map((r) => r.label);
-    expect(names).toEqual(expect.arrayContaining(['Morchella americana', 'Morchella sextelata', 'Morchella angusticeps']));
+    expect(names).toEqual(expect.arrayContaining([
+      'Morels and allies', 'Yellow morel (Morchella americana)', 'Burn morel (Morchella sextelata)', 'Black morel (Morchella angusticeps)',
+    ]));
+  });
+
+  it('offers a group of one as its species, with no separate group row', () => {
+    expect(searchSpecies(catalog, 'lobster')).toEqual([expect.objectContaining({
+      kind: 'group', id: 'lobster', label: 'Lobster mushroom (Hypomyces lactifluorum)', sci: 'Hypomyces lactifluorum',
+    })]);
+    expect(searchSpecies(catalog, 'Hypomyces lactifluorum').map((r) => r.id)).toEqual(['lobster']);
   });
 
   it('matches the singular common name', () => {
@@ -80,8 +89,14 @@ describe('expandSpeciesId', () => {
 });
 
 describe('describeSpeciesId', () => {
-  it('labels a species with its common name', () => {
-    expect(describeSpeciesId(catalog, 'hypomyces-lactifluorum')?.label).toBe('Hypomyces lactifluorum (Lobster mushroom)');
+  it('labels a species as common name (scientific name)', () => {
+    expect(describeSpeciesId(catalog, 'boletus-edulis')?.label).toBe('King bolete (Boletus edulis)');
+    expect(describeSpeciesId(catalog, 'hypomyces-lactifluorum')?.label).toBe('Lobster mushroom (Hypomyces lactifluorum)');
+  });
+
+  it('calls a group with several species "X and allies", and a group of one by its species', () => {
+    expect(describeSpeciesId(catalog, 'porcini')?.label).toBe('Porcini and allies');
+    expect(describeSpeciesId(catalog, 'matsutake')?.label).toBe('Matsutake (Tricholoma murrillianum)');
   });
 
   it('flags psilocybe for the legal note', () => {

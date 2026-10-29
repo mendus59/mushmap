@@ -1,7 +1,7 @@
 /** Loading the data the weekly pipeline generates, shared by the heat map and the trail finder. */
 import { h } from './dom';
 import { weekStart, type ModelIndex } from './heatmapModel';
-import type { Catalog } from './species';
+import { describeSpeciesId, hasAllies, type Catalog } from './species';
 
 const DATA = `${import.meta.env.BASE_URL}data/generated`;
 
@@ -25,13 +25,19 @@ export function shortDate(iso: string): string {
   return new Date(`${iso}T12:00:00`).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 }
 
-/** Fill a species select with every model, grouped as in the catalog. */
+/** Fill a species select with every model, grouped as in the catalog. A group of one is a single option. */
 export function fillModelSelect(select: HTMLSelectElement, catalog: Catalog, index: ModelIndex): void {
+  const option = (m: ModelIndex['models'][number]) => h('option', { value: m.id },
+    `${describeSpeciesId(catalog, m.id)?.label ?? m.label} · ${m.count.toLocaleString()} sightings`);
   for (const group of catalog.groups) {
     const entries = index.models.filter((m) => m.groupId === group.id);
     if (!entries.length) continue;
-    select.append(h('optgroup', { label: group.name },
-      ...entries.map((m) => h('option', { value: m.id },
-        `${m.kind === 'group' ? `All ${group.name.toLowerCase()}` : m.label} (${m.count.toLocaleString()} sightings)`))));
+    if (hasAllies(group)) {
+      select.append(h('optgroup', { label: describeSpeciesId(catalog, group.id)!.label }, ...entries.map(option)));
+    } else {
+      // The species model of a group of one repeats the group model, so offer only the group's.
+      const own = entries.find((m) => m.kind === 'group');
+      if (own) select.append(option(own));
+    }
   }
 }

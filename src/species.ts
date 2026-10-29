@@ -31,6 +31,9 @@ export interface SpeciesOption {
   kind: 'group' | 'species';
   id: string;
   label: string;
+  /** The parts of a species label, so the picker can set the scientific name in italics. */
+  common?: string;
+  sci?: string;
   detail: string;
   groupId: string;
 }
@@ -54,18 +57,42 @@ export function normalize(text: string): string {
     .trim();
 }
 
+/** A group is shown as "X and allies" only when its common name covers more than one species. */
+export function hasAllies(g: SpeciesGroup): boolean {
+  return g.species.length > 1;
+}
+
+/** "King bolete (Boletus edulis)", or just the scientific name when there is no common one. */
+export function speciesLabel(s: Species): string {
+  const common = s.commonNames[0];
+  return common ? `${common} (${s.scientificName})` : s.scientificName;
+}
+
+/** "Porcini and allies", or the lone species' label for a group of one. */
+export function groupLabel(g: SpeciesGroup): string {
+  return hasAllies(g) ? `${g.name} and allies` : speciesLabel(g.species[0]);
+}
+
+function speciesDetail(s: Species): string {
+  return [s.commonNames.slice(1).join(', '), ...s.synonyms.map((n) => `syn. ${n}`)].filter(Boolean).join(' · ');
+}
+
+/** A group of one is offered as that species, under the group's id so maps and filters still cover it. */
 function groupOption(g: SpeciesGroup): SpeciesOption {
-  return { kind: 'group', id: g.id, label: g.name, detail: `All ${g.species.length} species`, groupId: g.id };
+  if (!hasAllies(g)) {
+    const s = g.species[0];
+    return { kind: 'group', id: g.id, label: speciesLabel(s), common: s.commonNames[0], sci: s.scientificName, detail: speciesDetail(s), groupId: g.id };
+  }
+  return { kind: 'group', id: g.id, label: groupLabel(g), detail: `All ${g.species.length} species`, groupId: g.id };
 }
 
 function speciesOption(g: SpeciesGroup, s: Species): SpeciesOption {
-  return {
-    kind: 'species',
-    id: s.id,
-    label: s.scientificName,
-    detail: [s.commonNames.join(', '), ...s.synonyms.map((n) => `syn. ${n}`)].filter(Boolean).join(' · '),
-    groupId: g.id,
-  };
+  return { kind: 'species', id: s.id, label: speciesLabel(s), common: s.commonNames[0], sci: s.scientificName, detail: speciesDetail(s), groupId: g.id };
+}
+
+/** The group row, followed by its species when it has allies. */
+function groupOptions(g: SpeciesGroup): SpeciesOption[] {
+  return hasAllies(g) ? [groupOption(g), ...g.species.map((s) => speciesOption(g, s))] : [groupOption(g)];
 }
 
 /** "morel" finds "Morels". */
@@ -92,15 +119,15 @@ export function searchSpecies(catalog: Catalog, rawQuery: string): SpeciesOption
   const out: SpeciesOption[] = [];
   for (const g of catalog.groups) {
     if (!query) {
-      out.push(groupOption(g), ...g.species.map((s) => speciesOption(g, s)));
+      out.push(...groupOptions(g));
       continue;
     }
     const groupNames = [g.name, ...g.aliases];
     const hits = g.species.filter((s) => matches(query, [s.scientificName, ...s.commonNames, ...s.synonyms]));
     // A group name wins unless the query only mentions it alongside a specific species,
     // e.g. "Morchella esculenta" should give that species, not every morel.
-    if (partOf(query, groupNames) || (!hits.length && mentionedIn(query, groupNames))) {
-      out.push(groupOption(g), ...g.species.map((s) => speciesOption(g, s)));
+    if (partOf(query, groupNames) || (!hits.length && mentionedIn(query, groupNames)) || (hits.length && !hasAllies(g))) {
+      out.push(...groupOptions(g));
     } else {
       out.push(...hits.map((s) => speciesOption(g, s)));
     }
@@ -117,12 +144,9 @@ export function expandSpeciesId(catalog: Catalog, id: string): Set<string> {
 
 export function describeSpeciesId(catalog: Catalog, id: string): { label: string; group: SpeciesGroup } | null {
   for (const g of catalog.groups) {
-    if (g.id === id) return { label: g.name, group: g };
+    if (g.id === id) return { label: groupLabel(g), group: g };
     const s = g.species.find((x) => x.id === id);
-    if (s) {
-      const common = s.commonNames[0];
-      return { label: common ? `${s.scientificName} (${common})` : s.scientificName, group: g };
-    }
+    if (s) return { label: speciesLabel(s), group: g };
   }
   return null;
 }
