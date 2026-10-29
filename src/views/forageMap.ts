@@ -117,7 +117,10 @@ export function forageMapView(catalog: Catalog, uid: string): HTMLElement {
   const models = new Map<string, Promise<Model | null>>();
   const boundaries = new Map<number, [number, number][]>();
   const fetchModel = (id: string) => {
-    if (!models.has(id)) models.set(id, getJson<Model>(`model/${id}.json`));
+    if (!models.has(id)) {
+      // A failed download is forgotten so the next try fetches again.
+      models.set(id, getJson<Model>(`model/${id}.json`).catch((e) => { models.delete(id); throw e; }));
+    }
     return models.get(id)!;
   };
   const ownFor = (id: string) => {
@@ -249,10 +252,8 @@ export function forageMapView(catalog: Catalog, uid: string): HTMLElement {
     likely.setPlace({ kind: 'trail', label: t.n, cells: t.c });
     html.append(h('div', {}, h('button', {
       type: 'button', class: 'text-link',
-      onclick: () => {
-        likely.run();
-        likely.el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      },
+      // Picking the trail already set the place; this brings the list into view.
+      onclick: () => likely.el.scrollIntoView({ behavior: 'smooth', block: 'start' }),
     }, 'What mushrooms are likely here?')));
     const end = nearestEnd(t, at);
     if (end) {

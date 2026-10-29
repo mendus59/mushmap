@@ -34,8 +34,6 @@ export interface LikelyHerePanel {
   el: HTMLElement;
   setData: (data: PlaceData) => void;
   setPlace: (place: Place) => void;
-  /** Score the current place now, and keep it up to date as the place or date changes. */
-  run: () => void;
 }
 
 function pct(x: number): string {
@@ -55,16 +53,17 @@ export function likelyHerePanel(
   const todayBtn = h('button', { type: 'button', class: 'text-link' }, 'Today');
   const placeText = h('strong', {}, 'The map view');
   const useView = h('button', { type: 'button' }, 'Use the map view');
-  const check = h('button', { type: 'button', class: 'primary', disabled: true }, 'Show likely mushrooms');
-  const note = h('p', { class: 'muted' },
-    'Pick a place: tap a trail, draw an area, or use the map view. Then pick a date.');
+  const note = h('p', { class: 'muted' }, 'Loading map data…');
+  const help = h('p', { class: 'muted' },
+    'Tap a trail, draw an area, or use the map view, and pick a date. The list updates as you go.');
   const list = h('ol', { class: 'likely-list' });
   const hiddenNote = h('p', { class: 'muted' });
 
   let data: PlaceData | null = null;
   let place: Place | null = null;
-  let active = false;
   let runId = 0;
+  /** The models are a large download, so nothing loads until the card has come into view. */
+  let seen = typeof IntersectionObserver === 'undefined';
 
   const placeCells = (p: Place, d: PlaceData): number[] => {
     if (p.kind === 'trail') return p.cells;
@@ -82,8 +81,17 @@ export function likelyHerePanel(
   const render = async () => {
     if (!data || !place) return;
     const id = ++runId;
-    const d = data;
-    const p = place;
+    try {
+      await score(id, data, place);
+    } catch (e) {
+      if (id !== runId) return;
+      clear(list);
+      hiddenNote.textContent = '';
+      note.textContent = `Could not work out what is likely here: ${e instanceof Error ? e.message : e}`;
+    }
+  };
+
+  const score = async (id: number, d: PlaceData, p: Place) => {
     const day = parseLocalDate(date.value) ?? parseLocalDate(today)!;
     const week = isoWeek(day);
     const cells = placeCells(p, d);
@@ -94,18 +102,31 @@ export function likelyHerePanel(
       note.textContent = 'That place is outside the area MushMap covers (Washington and Oregon).';
       return;
     }
-    note.textContent = 'Loading the mushroom models…';
+    clear(list);
+    hiddenNote.textContent = '';
+    // The models load in parallel once and are cached, so later places and dates are quick.
+    let loaded = 0;
+    const progress = () => {
+      if (id === runId) note.textContent = `Loading the mushroom models (${loaded} of ${d.models.length})…`;
+    };
+    progress();
+    const models = await Promise.all(d.models.map((entry) => d.loadModel(entry.id)
+      .catch(() => null)
+      .then((m) => { loaded++; progress(); return m; })));
+    if (id !== runId) return; // the place or date changed meanwhile
+    if (!models.some(Boolean)) {
+      note.textContent = 'Could not load the mushroom models. Check your connection and try again.';
+      return;
+    }
     const weather = weatherCovers(new Date(), day) ? weatherForWeek(d.grid, week, d.current, d.forecast) : null;
     const items: RankedMushroom[] = [];
-    for (const entry of d.models) {
-      const model = await d.loadModel(entry.id).catch(() => null);
-      if (id !== runId) return; // the place or date changed meanwhile
-      if (!model) continue;
+    d.models.forEach((entry, n) => {
+      const model = models[n];
+      if (!model) return;
       const { likelihood, best } = placeLikelihood(d.grid, model, cells, week, weather, d.ownFor(entry.id));
       items.push({ id: entry.id, label: describeSpeciesId(catalog, entry.id)?.label ?? entry.label, likelihood, best });
-    }
+    });
     const { shown, hidden } = rankMushrooms(items);
-    clear(list);
     for (const m of shown) {
       const group = catalog.groups.find((g) => g.id === m.id);
       const why = likelihoodReasons(m.best);
@@ -132,32 +153,35 @@ export function likelyHerePanel(
 
   const update = () => {
     placeText.textContent = place?.label ?? 'No place picked';
-    check.disabled = !data || !place;
-    if (active) void render();
+    if (seen) void render();
   };
 
   date.addEventListener('change', update);
   todayBtn.addEventListener('click', () => { date.value = localIsoDate(new Date()); update(); });
   useView.addEventListener('click', () => {
     place = { kind: 'view', label: 'The map view' };
-    active = true;
     update();
   });
-  const run = () => {
-    active = true;
-    update();
-  };
-  check.addEventListener('click', run);
 
   const el = h('div', { class: 'card' },
     h('h2', {}, 'What\'s likely here'),
     h('div', { class: 'field' }, h('span', {}, 'Place'), h('div', { class: 'row likely-place' }, placeText, useView)),
     h('label', { class: 'field' }, h('span', {}, 'Date'), h('div', { class: 'row likely-date' }, date, todayBtn)),
-    h('div', { class: 'row' }, check),
+    help,
     note,
     list,
     hiddenNote,
     h('p', { class: 'note' }, SAFETY_NOTE));
+
+  if (!seen) {
+    const observer = new IntersectionObserver((entries) => {
+      if (!entries.some((e) => e.isIntersecting)) return;
+      observer.disconnect();
+      seen = true;
+      update();
+    }, { rootMargin: '200px' });
+    observer.observe(el);
+  }
 
   return {
     el,
@@ -170,7 +194,6 @@ export function likelyHerePanel(
       place = p;
       update();
     },
-    run,
   };
 }
 
