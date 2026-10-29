@@ -7,6 +7,7 @@ import { groupNotes } from '../legal';
 import { createMap } from '../map';
 import { describeSpeciesId, expandSpeciesId, type Catalog } from '../species';
 import { speciesPicker } from '../speciesPicker';
+import { addFindView } from './addFind';
 
 const CLUSTER_LABELS = { solitary: 'Solitary', small: 'Small cluster', large: 'Large cluster' } as const;
 
@@ -19,7 +20,7 @@ function formatDate(d: Date | null): string {
   return d ? d.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' }) : 'No date';
 }
 
-export function findsView(uid: string, catalog: Catalog): HTMLElement {
+export function findsView(uid: string, catalog: Catalog, { startLogging = false } = {}): HTMLElement {
   let all: Find[] = [];
   let mode: 'list' | 'map' = 'list';
   const filter: FindFilter = emptyFilter();
@@ -190,9 +191,31 @@ export function findsView(uid: string, catalog: Catalog): HTMLElement {
     );
   });
 
+  // Logging a find happens on this page: the form opens above the journal.
+  const logSlot = h('div');
+  const logButton = h('button', { class: 'primary' }, '+ Log a find');
+  const closeLog = () => {
+    clear(logSlot);
+    logButton.hidden = false;
+    if (location.hash === '#/add') history.replaceState(null, '', '#/finds');
+  };
+  const openLog = () => {
+    logButton.hidden = true;
+    clear(logSlot);
+    logSlot.append(addFindView(uid, catalog, {
+      onSaved: () => { closeLog(); load(); },
+      onCancel: closeLog,
+    }));
+    logSlot.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+  logButton.addEventListener('click', openLog);
+  if (startLogging) requestAnimationFrame(openLog);
+
   load();
 
   return h('section', {},
+    h('div', { class: 'row between' }, h('h1', {}, 'My finds'), logButton),
+    logSlot,
     h('div', { class: 'card filters' },
       h('label', { class: 'field' }, h('span', {}, 'Species'), picker.el),
       h('div', { class: 'row' },

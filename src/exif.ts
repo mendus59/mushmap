@@ -55,16 +55,38 @@ export function metaFromExif(tags: ExifTags | undefined | null): PhotoMeta {
   };
 }
 
+// Only the blocks that hold the capture time and GPS. No `pick` list: with one,
+// exifr can skip the GPS block in some HEIC and Android JPEG layouts.
+const PARSE_OPTIONS = {
+  tiff: true, exif: true, gps: true,
+  ifd1: false, interop: false, xmp: false, icc: false, iptc: false, jfif: false, ihdr: false,
+};
+
 export async function readPhotoMeta(file: Blob): Promise<PhotoMeta> {
+  let meta: PhotoMeta = { takenAt: null, lat: null, lon: null };
+  // Hand exifr the whole file: its chunked Blob reader can stop before the GPS
+  // block in large phone photos.
+  let bytes: ArrayBuffer;
   try {
-    const tags = await exifr.parse(file, {
-      pick: ['DateTimeOriginal', 'CreateDate', 'OffsetTimeOriginal', 'GPSLatitude', 'GPSLongitude', 'GPSLatitudeRef', 'GPSLongitudeRef'],
-      gps: true,
-    });
-    return metaFromExif(tags);
+    bytes = await file.arrayBuffer();
   } catch {
-    return { takenAt: null, lat: null, lon: null };
+    return meta;
   }
+  try {
+    meta = metaFromExif(await exifr.parse(bytes, PARSE_OPTIONS));
+  } catch {
+    // Fall through to the GPS-only reader below.
+  }
+  if (meta.lat === null) {
+    try {
+      const gps = await exifr.gps(bytes);
+      const fromGps = metaFromExif(gps ? { latitude: gps.latitude, longitude: gps.longitude } : null);
+      meta = { ...meta, lat: fromGps.lat, lon: fromGps.lon };
+    } catch {
+      // No GPS block at all.
+    }
+  }
+  return meta;
 }
 
 /** First photo with a timestamp gives the time; first with GPS gives the place. */

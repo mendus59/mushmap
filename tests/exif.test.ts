@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { mergeMeta, metaFromExif } from '../src/exif';
+import { readFileSync } from 'node:fs';
+import { mergeMeta, metaFromExif, readPhotoMeta } from '../src/exif';
 import { fitWithin } from '../src/image';
 
 describe('metaFromExif', () => {
@@ -27,6 +28,20 @@ describe('metaFromExif', () => {
   it('falls back to CreateDate', () => {
     const d = new Date(2026, 4, 1, 8, 0);
     expect(metaFromExif({ CreateDate: d }).takenAt).toEqual(d);
+  });
+});
+
+describe('readPhotoMeta', () => {
+  it('reads GPS and time from a JPEG file', async () => {
+    const bytes = readFileSync(new URL('./fixtures/gps.jpg', import.meta.url));
+    const meta = await readPhotoMeta(new Blob([bytes], { type: 'image/jpeg' }));
+    expect(meta.lat).toBeCloseTo(45.5, 5);
+    expect(meta.lon).toBeCloseTo(-122.6, 5);
+    expect(meta.takenAt).not.toBeNull();
+  });
+
+  it('returns nothing for a file that is not an image', async () => {
+    expect(await readPhotoMeta(new Blob(['hello']))).toEqual({ takenAt: null, lat: null, lon: null });
   });
 });
 

@@ -21,8 +21,7 @@ function renderNav() {
   const link = (route: Route, label: string, also: Route[] = [route]) =>
     h('a', { href: `#/${route}`, class: also.includes(currentRoute()) ? 'active' : '' }, label);
   nav.append(
-    link('finds', 'My finds'),
-    link('add', 'Log a find'),
+    link('finds', 'My finds', ['finds', 'add']),
     link('heatmap', 'Map', ['heatmap', 'trails']),
     h('button', { class: 'link', onclick: () => signOut(getFirebase().auth) }, 'Sign out'),
   );
@@ -46,11 +45,6 @@ async function render() {
   // Views load on demand so the map library is not in the first download.
   // The trail finder and heat map share one page; #/trails is kept for old links.
   switch (currentRoute()) {
-    case 'add': {
-      const { addFindView } = await import('./views/addFind');
-      app.append(addFindView(uid, catalog, () => { location.hash = '#/finds'; }));
-      break;
-    }
     case 'heatmap':
     case 'trails': {
       const { forageMapView } = await import('./views/forageMap');
@@ -58,8 +52,9 @@ async function render() {
       break;
     }
     default: {
+      // #/add is kept for old links: it opens the journal with the log form showing.
       const { findsView } = await import('./views/finds');
-      app.append(findsView(uid, catalog));
+      app.append(findsView(uid, catalog, { startLogging: currentRoute() === 'add' }));
     }
   }
 }
