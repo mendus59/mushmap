@@ -19,6 +19,10 @@ A mushroom foraging journal and heat map for Washington and Oregon, hosted on Gi
   to 100 for easy, gentle trails on open public land that start at a road or trailhead. Pick a mushroom and a
   week, search the map view or draw an area, and get the trails ranked by the geometric mean of the chance
   of the mushroom along them (from the heat map) and their accessibility.
+- **Installable app.** MushMap is a Progressive Web App. On Android or desktop Chrome and Edge, use
+  **Install app** in the top bar (or the browser's install menu); on an iPhone or iPad, open it in Safari and
+  pick Share > Add to Home Screen. Once opened online, the app itself loads offline, and the last heat map,
+  trail and species data it fetched stay available.
 
 ## Stack
 
@@ -28,6 +32,7 @@ A mushroom foraging journal and heat map for Washington and Oregon, hosted on Gi
 | Accounts and data | Firebase Authentication (Google, email) and Cloud Firestore on the free Spark plan |
 | Photos | Compressed in the browser to about 150 KB WebP and stored in Firestore (`users/{uid}/finds/{id}/photos/{n}`) |
 | Maps | MapLibre GL with OpenFreeMap tiles; zoomed in, the USGS National Map topo (forest roads, trails, contours) or OpenTopoMap (all free, no key) |
+| Offline and install | `public/manifest.webmanifest`, icons in `public/icons/`, and a service worker built from `pwa/sw.js` by a small plugin in `vite.config.ts` (production builds only) |
 | Elevation | Open-Meteo elevation API for single finds; AWS Terrain Tiles for the heat map grid (both free, no key) |
 
 ## Firebase setup

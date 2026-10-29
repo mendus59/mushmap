@@ -4,6 +4,7 @@ import { getFirebase, isConfigured } from './firebase';
 import { loadCatalog } from './species';
 import { signInView } from './views/signIn';
 import './style.css';
+import './pwa';
 
 const app = document.getElementById('app')!;
 const nav = document.getElementById('nav')!;
