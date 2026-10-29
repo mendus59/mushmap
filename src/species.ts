@@ -12,6 +12,8 @@ export interface SpeciesGroup {
   /** iNaturalist taxon names the data pipeline queries for this group. */
   inatTaxa: string[];
   legalNote?: boolean;
+  /** Dangerous or confusing lookalikes, shown wherever the group is picked. */
+  lookalikes?: string;
   /** Host-tree gate for the heat map (FIA species codes from the USFS tree maps). */
   hostFloor?: number;
   hostTrees?: { fia: number; name: string; weight: number }[];
