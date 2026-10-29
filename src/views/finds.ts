@@ -3,7 +3,7 @@ import { h, clear } from '../dom';
 import { emptyFilter, matchesFilter, type FindFilter } from '../filters';
 import { deleteFind, listFinds, listPhotos, type Find } from '../finds';
 import { bytesToUrl } from '../image';
-import { legalNoteEl } from '../legal';
+import { groupNotes } from '../legal';
 import { createMap } from '../map';
 import { describeSpeciesId, expandSpeciesId, type Catalog } from '../species';
 import { speciesPicker } from '../speciesPicker';
@@ -55,7 +55,7 @@ export function findsView(uid: string, catalog: Catalog): HTMLElement {
     dialog.append(h('div', {},
       h('h2', {}, findName(catalog, f)),
       gallery,
-      group?.legalNote ? legalNoteEl() : null,
+      ...groupNotes(group),
       h('dl', {},
         row('When', formatDate(f.takenAt)),
         row('Where', f.lat !== null ? `${f.lat.toFixed(5)}, ${f.lon!.toFixed(5)}` : null),

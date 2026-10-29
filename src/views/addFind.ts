@@ -2,7 +2,7 @@ import { h, clear } from '../dom';
 import { mergeMeta, readPhotoMeta } from '../exif';
 import { MAX_PHOTOS_PER_FIND, lookupElevation, saveFind, type ClusterSize, type FindInput } from '../finds';
 import { blobToBytes, compressPhoto, type CompressedPhoto } from '../image';
-import { legalNoteEl } from '../legal';
+import { groupNotes } from '../legal';
 import { createMap, maplibregl } from '../map';
 import { describeSpeciesId, type Catalog } from '../species';
 import { speciesPicker } from '../speciesPicker';
@@ -29,7 +29,7 @@ export function addFindView(uid: string, catalog: Catalog, onSaved: () => void):
     placeholder: 'Search species, e.g. morel, chanterelle, Boletus edulis',
     onChange: (o) => {
       clear(legalSlot);
-      if (o && describeSpeciesId(catalog, o.id)?.group.legalNote) legalSlot.append(legalNoteEl());
+      if (o) legalSlot.append(...groupNotes(describeSpeciesId(catalog, o.id)?.group));
     },
   });
   const useCustom = h('input', { type: 'checkbox' });

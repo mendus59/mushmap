@@ -1,4 +1,5 @@
 import { h } from './dom';
+import type { SpeciesGroup } from './species';
 
 // Scoped to Washington and Oregon, the app's first region. Review against current law before launch.
 export const PSILOCYBE_NOTE =
@@ -14,4 +15,13 @@ export const SAFETY_NOTE =
 
 export function legalNoteEl(): HTMLElement {
   return h('p', { class: 'note legal' }, PSILOCYBE_NOTE);
+}
+
+/** The legal note (if any) and the dangerous-lookalike warning for a group, ready to append. */
+export function groupNotes(group: SpeciesGroup | undefined): HTMLElement[] {
+  if (!group) return [];
+  const notes: HTMLElement[] = [];
+  if (group.legalNote) notes.push(legalNoteEl());
+  if (group.lookalikes) notes.push(h('p', { class: 'note lookalikes' }, h('strong', {}, 'Lookalikes: '), group.lookalikes));
+  return notes;
 }

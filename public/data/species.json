@@ -147,7 +147,8 @@
           ],
           "synonyms": []
         }
-      ]
+      ],
+      "lookalikes": "False morels (Gyromitra) have brain-like, wrinkled caps with cottony chambers inside and can be deadly. Verpa bohemica has a cap that hangs free like a thimble. Cut every morel in half: true morels are hollow from cap tip to stem base."
     },
     {
       "id": "porcini",
@@ -289,7 +290,8 @@
           ],
           "synonyms": []
         }
-      ]
+      ],
+      "lookalikes": "No deadly lookalikes here, but bitter Tylopilus and red-pored or quick blue-staining boletes (such as Rubroboletus) cause stomach upsets. King boletes have white to olive pores that do not bruise blue."
     },
     {
       "id": "chanterelles",
@@ -457,7 +459,8 @@
           ],
           "synonyms": []
         }
-      ]
+      ],
+      "lookalikes": "False chanterelle (Hygrophoropsis aurantiaca) has true, thin, forked gills and orange flesh. Jack-o'-lantern relatives (Omphalotus) grow in clusters on wood and are toxic. Chanterelles have blunt false ridges and white, stringy flesh."
     },
     {
       "id": "lobster",
@@ -527,7 +530,8 @@
           ],
           "synonyms": []
         }
-      ]
+      ],
+      "lookalikes": "The host mushroom underneath is usually a Russula or Lactarius and cannot be confirmed once covered. Skip any that are soft, mushy or have a white mold spreading over them."
     },
     {
       "id": "cauliflower",
@@ -613,7 +617,8 @@
           ],
           "synonyms": []
         }
-      ]
+      ],
+      "lookalikes": "No dangerous lookalikes. Coral fungi (Ramaria) are branched like antlers rather than leafy, and some cause stomach upsets."
     },
     {
       "id": "psilocybe",
@@ -694,7 +699,8 @@
           ],
           "synonyms": []
         }
-      ]
+      ],
+      "lookalikes": "Deadly Galerina marginata grows on the same wood chips and logs. It has rusty-brown spores and does not bruise blue. Never rely on bluing alone."
     },
     {
       "id": "blewits",
@@ -768,6 +774,660 @@
             "Lepista saeva",
             "Collybia personata"
           ]
+        }
+      ],
+      "lookalikes": "Purple webcaps (Cortinarius) look similar and some are toxic. Webcaps have a cobweb veil when young and rusty-brown spores; blewits have pale pinkish-buff spores."
+    },
+    {
+      "id": "hedgehogs",
+      "name": "Hedgehog mushrooms",
+      "aliases": [
+        "hedgehog",
+        "hedgehogs",
+        "hydnum",
+        "sweet tooth",
+        "pied de mouton"
+      ],
+      "inatTaxa": [
+        "Hydnum"
+      ],
+      "hostFloor": 0.1,
+      "hostTrees": [
+        {
+          "fia": 202,
+          "name": "Douglas-fir",
+          "weight": 1
+        },
+        {
+          "fia": 263,
+          "name": "Western hemlock",
+          "weight": 1
+        },
+        {
+          "fia": 98,
+          "name": "Sitka spruce",
+          "weight": 0.7
+        },
+        {
+          "fia": 631,
+          "name": "Tanoak",
+          "weight": 0.6
+        },
+        {
+          "fia": 11,
+          "name": "Pacific silver fir",
+          "weight": 0.5
+        },
+        {
+          "fia": 17,
+          "name": "Grand fir",
+          "weight": 0.4
+        },
+        {
+          "fia": 361,
+          "name": "Pacific madrone",
+          "weight": 0.3
+        }
+      ],
+      "lookalikes": "No deadly lookalikes. Hedgehogs have soft spines under the cap instead of gills or pores. Bitter tooth fungi (Sarcodon, Hydnellum) are tough, corky or scaly.",
+      "species": [
+        {
+          "id": "hydnum-repandum",
+          "scientificName": "Hydnum repandum",
+          "commonNames": [
+            "Hedgehog",
+            "Sweet tooth"
+          ],
+          "synonyms": []
+        },
+        {
+          "id": "hydnum-umbilicatum",
+          "scientificName": "Hydnum umbilicatum",
+          "commonNames": [
+            "Belly-button hedgehog"
+          ],
+          "synonyms": []
+        },
+        {
+          "id": "hydnum-washingtonianum",
+          "scientificName": "Hydnum washingtonianum",
+          "commonNames": [
+            "Washington hedgehog"
+          ],
+          "synonyms": []
+        },
+        {
+          "id": "hydnum-oregonense",
+          "scientificName": "Hydnum oregonense",
+          "commonNames": [
+            "Oregon hedgehog"
+          ],
+          "synonyms": []
+        },
+        {
+          "id": "hydnum-neorepandum",
+          "scientificName": "Hydnum neorepandum",
+          "commonNames": [
+            "Western hedgehog"
+          ],
+          "synonyms": []
+        }
+      ]
+    },
+    {
+      "id": "matsutake",
+      "name": "Matsutake",
+      "aliases": [
+        "matsutake",
+        "pine mushroom",
+        "white matsutake",
+        "american matsutake"
+      ],
+      "inatTaxa": [
+        "Tricholoma murrillianum",
+        "Tricholoma magnivelare"
+      ],
+      "hostFloor": 0.15,
+      "hostTrees": [
+        {
+          "fia": 108,
+          "name": "Lodgepole pine",
+          "weight": 1
+        },
+        {
+          "fia": 631,
+          "name": "Tanoak",
+          "weight": 0.8
+        },
+        {
+          "fia": 202,
+          "name": "Douglas-fir",
+          "weight": 0.7
+        },
+        {
+          "fia": 263,
+          "name": "Western hemlock",
+          "weight": 0.6
+        },
+        {
+          "fia": 122,
+          "name": "Ponderosa pine",
+          "weight": 0.6
+        },
+        {
+          "fia": 98,
+          "name": "Sitka spruce",
+          "weight": 0.5
+        },
+        {
+          "fia": 15,
+          "name": "White fir",
+          "weight": 0.5
+        },
+        {
+          "fia": 361,
+          "name": "Pacific madrone",
+          "weight": 0.3
+        }
+      ],
+      "lookalikes": "Amanita smithiana is deadly (kidney failure): white, with a ragged ring and a tapering, rooting base, and no spicy cinnamon smell. Also look out for other white Amanitas. Matsutake have a firm flared ring, a blunt stem base and a strong spicy smell. Harvest on national forest land usually needs a permit.",
+      "species": [
+        {
+          "id": "tricholoma-murrillianum",
+          "scientificName": "Tricholoma murrillianum",
+          "commonNames": [
+            "Matsutake",
+            "Western matsutake",
+            "Pine mushroom"
+          ],
+          "synonyms": [
+            "Tricholoma magnivelare"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chicken",
+      "name": "Chicken of the woods",
+      "aliases": [
+        "chicken of the woods",
+        "sulphur shelf",
+        "sulfur shelf",
+        "laetiporus",
+        "chicken mushroom"
+      ],
+      "inatTaxa": [
+        "Laetiporus conifericola",
+        "Laetiporus gilbertsonii"
+      ],
+      "hostFloor": 0.2,
+      "hostTrees": [
+        {
+          "fia": 17,
+          "name": "Grand fir",
+          "weight": 1
+        },
+        {
+          "fia": 15,
+          "name": "White fir",
+          "weight": 0.8
+        },
+        {
+          "fia": 263,
+          "name": "Western hemlock",
+          "weight": 0.8
+        },
+        {
+          "fia": 202,
+          "name": "Douglas-fir",
+          "weight": 0.7
+        },
+        {
+          "fia": 11,
+          "name": "Pacific silver fir",
+          "weight": 0.6
+        },
+        {
+          "fia": 22,
+          "name": "Noble fir",
+          "weight": 0.5
+        },
+        {
+          "fia": 98,
+          "name": "Sitka spruce",
+          "weight": 0.5
+        },
+        {
+          "fia": 19,
+          "name": "Subalpine fir",
+          "weight": 0.4
+        },
+        {
+          "fia": 93,
+          "name": "Engelmann spruce",
+          "weight": 0.4
+        }
+      ],
+      "lookalikes": "No deadly lookalikes. Some people get stomach upsets, more often from conifer and eucalyptus hosts. Eat only the tender edges, cook well, and try a small amount first.",
+      "species": [
+        {
+          "id": "laetiporus-conifericola",
+          "scientificName": "Laetiporus conifericola",
+          "commonNames": [
+            "Conifer chicken of the woods"
+          ],
+          "synonyms": []
+        },
+        {
+          "id": "laetiporus-gilbertsonii",
+          "scientificName": "Laetiporus gilbertsonii",
+          "commonNames": [
+            "Western chicken of the woods"
+          ],
+          "synonyms": []
+        }
+      ]
+    },
+    {
+      "id": "oysters",
+      "name": "Oyster mushrooms",
+      "aliases": [
+        "oyster",
+        "oysters",
+        "oyster mushroom",
+        "pleurotus"
+      ],
+      "inatTaxa": [
+        "Pleurotus pulmonarius",
+        "Pleurotus ostreatus",
+        "Pleurotus populinus"
+      ],
+      "hostFloor": 0.4,
+      "hostTrees": [
+        {
+          "fia": 351,
+          "name": "Red alder",
+          "weight": 1
+        },
+        {
+          "fia": 747,
+          "name": "Black cottonwood",
+          "weight": 1
+        },
+        {
+          "fia": 312,
+          "name": "Bigleaf maple",
+          "weight": 0.8
+        },
+        {
+          "fia": 746,
+          "name": "Quaking aspen",
+          "weight": 0.8
+        }
+      ],
+      "lookalikes": "Angel wings (Pleurocybella porrigens) are thin, pure white fans on conifer logs and have been linked to deaths. Oysters grow on hardwoods, are thicker, and have gills running down to a short side stem. Bitter Lentinellus has saw-toothed gills.",
+      "species": [
+        {
+          "id": "pleurotus-pulmonarius",
+          "scientificName": "Pleurotus pulmonarius",
+          "commonNames": [
+            "Summer oyster",
+            "Phoenix oyster"
+          ],
+          "synonyms": []
+        },
+        {
+          "id": "pleurotus-ostreatus",
+          "scientificName": "Pleurotus ostreatus",
+          "commonNames": [
+            "Oyster mushroom"
+          ],
+          "synonyms": []
+        },
+        {
+          "id": "pleurotus-populinus",
+          "scientificName": "Pleurotus populinus",
+          "commonNames": [
+            "Aspen oyster"
+          ],
+          "synonyms": []
+        }
+      ]
+    },
+    {
+      "id": "shaggy-mane",
+      "name": "Shaggy mane",
+      "aliases": [
+        "shaggy mane",
+        "shaggy manes",
+        "lawyer's wig",
+        "shaggy ink cap",
+        "coprinus"
+      ],
+      "inatTaxa": [
+        "Coprinus comatus"
+      ],
+      "hostFloor": 1.0,
+      "hostTrees": [],
+      "lookalikes": "Common ink cap (Coprinopsis atramentaria) is smooth and grey and causes violent reactions with alcohol. Young green-spored parasol (Chlorophyllum molybdites) causes severe stomach poisoning. Cook shaggy manes within hours, before the gills turn black.",
+      "species": [
+        {
+          "id": "coprinus-comatus",
+          "scientificName": "Coprinus comatus",
+          "commonNames": [
+            "Shaggy mane",
+            "Lawyer's wig"
+          ],
+          "synonyms": []
+        }
+      ]
+    },
+    {
+      "id": "hericium",
+      "name": "Lion's mane and bear's head",
+      "aliases": [
+        "lion's mane",
+        "lions mane",
+        "bear's head",
+        "bears head",
+        "coral tooth",
+        "hericium"
+      ],
+      "inatTaxa": [
+        "Hericium"
+      ],
+      "hostFloor": 0.15,
+      "hostTrees": [
+        {
+          "fia": 17,
+          "name": "Grand fir",
+          "weight": 1
+        },
+        {
+          "fia": 11,
+          "name": "Pacific silver fir",
+          "weight": 0.8
+        },
+        {
+          "fia": 15,
+          "name": "White fir",
+          "weight": 0.8
+        },
+        {
+          "fia": 22,
+          "name": "Noble fir",
+          "weight": 0.6
+        },
+        {
+          "fia": 202,
+          "name": "Douglas-fir",
+          "weight": 0.6
+        },
+        {
+          "fia": 263,
+          "name": "Western hemlock",
+          "weight": 0.6
+        },
+        {
+          "fia": 312,
+          "name": "Bigleaf maple",
+          "weight": 0.3
+        }
+      ],
+      "lookalikes": "No toxic lookalikes. Look for soft white icicle-like spines hanging from logs, stumps or wounds on living trees.",
+      "species": [
+        {
+          "id": "hericium-abietis",
+          "scientificName": "Hericium abietis",
+          "commonNames": [
+            "Western bear's head",
+            "Conifer coral"
+          ],
+          "synonyms": []
+        },
+        {
+          "id": "hericium-coralloides",
+          "scientificName": "Hericium coralloides",
+          "commonNames": [
+            "Coral tooth"
+          ],
+          "synonyms": []
+        },
+        {
+          "id": "hericium-americanum",
+          "scientificName": "Hericium americanum",
+          "commonNames": [
+            "Bear's head tooth"
+          ],
+          "synonyms": []
+        },
+        {
+          "id": "hericium-erinaceus",
+          "scientificName": "Hericium erinaceus",
+          "commonNames": [
+            "Lion's mane"
+          ],
+          "synonyms": []
+        }
+      ]
+    },
+    {
+      "id": "yellowfoot",
+      "name": "Yellowfoot",
+      "aliases": [
+        "yellowfoot",
+        "yellow foot",
+        "winter chanterelle",
+        "funnel chanterelle"
+      ],
+      "inatTaxa": [
+        "Craterellus tubaeformis"
+      ],
+      "hostFloor": 0.1,
+      "hostTrees": [
+        {
+          "fia": 263,
+          "name": "Western hemlock",
+          "weight": 1
+        },
+        {
+          "fia": 98,
+          "name": "Sitka spruce",
+          "weight": 0.8
+        },
+        {
+          "fia": 202,
+          "name": "Douglas-fir",
+          "weight": 0.7
+        },
+        {
+          "fia": 11,
+          "name": "Pacific silver fir",
+          "weight": 0.5
+        },
+        {
+          "fia": 242,
+          "name": "Western redcedar",
+          "weight": 0.4
+        }
+      ],
+      "lookalikes": "Deadly Galerina marginata and other little brown mushrooms grow on the same rotting logs. Yellowfoot have blunt, forked false gills, a hollow yellow stem and a brown funnel cap.",
+      "species": [
+        {
+          "id": "craterellus-tubaeformis",
+          "scientificName": "Craterellus tubaeformis",
+          "commonNames": [
+            "Yellowfoot",
+            "Winter chanterelle"
+          ],
+          "synonyms": [
+            "Craterellus neotubaeformis",
+            "Cantharellus tubaeformis"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "black-trumpets",
+      "name": "Black trumpets",
+      "aliases": [
+        "black trumpet",
+        "black trumpets",
+        "horn of plenty",
+        "trompette de la mort",
+        "craterellus"
+      ],
+      "inatTaxa": [
+        "Craterellus calicornucopioides",
+        "Craterellus cornucopioides"
+      ],
+      "hostFloor": 0.1,
+      "hostTrees": [
+        {
+          "fia": 631,
+          "name": "Tanoak",
+          "weight": 1
+        },
+        {
+          "fia": 202,
+          "name": "Douglas-fir",
+          "weight": 0.5
+        },
+        {
+          "fia": 361,
+          "name": "Pacific madrone",
+          "weight": 0.5
+        },
+        {
+          "fia": 815,
+          "name": "Oregon white oak",
+          "weight": 0.5
+        }
+      ],
+      "lookalikes": "No dangerous lookalikes. Black trumpets are thin, hollow, grey-black funnels with a smooth or lightly wrinkled underside.",
+      "species": [
+        {
+          "id": "craterellus-calicornucopioides",
+          "scientificName": "Craterellus calicornucopioides",
+          "commonNames": [
+            "Black trumpet",
+            "Western black trumpet"
+          ],
+          "synonyms": []
+        },
+        {
+          "id": "craterellus-cornucopioides",
+          "scientificName": "Craterellus cornucopioides",
+          "commonNames": [
+            "Horn of plenty"
+          ],
+          "synonyms": []
+        }
+      ]
+    },
+    {
+      "id": "candy-caps",
+      "name": "Candy caps",
+      "aliases": [
+        "candy cap",
+        "candy caps",
+        "maple syrup mushroom"
+      ],
+      "inatTaxa": [
+        "Lactarius rubidus",
+        "Lactarius fragilis"
+      ],
+      "hostFloor": 0.1,
+      "hostTrees": [
+        {
+          "fia": 631,
+          "name": "Tanoak",
+          "weight": 1
+        },
+        {
+          "fia": 202,
+          "name": "Douglas-fir",
+          "weight": 0.5
+        },
+        {
+          "fia": 815,
+          "name": "Oregon white oak",
+          "weight": 0.5
+        },
+        {
+          "fia": 98,
+          "name": "Sitka spruce",
+          "weight": 0.4
+        },
+        {
+          "fia": 361,
+          "name": "Pacific madrone",
+          "weight": 0.3
+        }
+      ],
+      "lookalikes": "Other small orange-brown milk caps can be acrid or toxic, and deadly Galerina can grow nearby. Candy caps have watery, whey-like milk, no bitter taste, and smell of maple syrup when dried.",
+      "species": [
+        {
+          "id": "lactarius-rubidus",
+          "scientificName": "Lactarius rubidus",
+          "commonNames": [
+            "Candy cap"
+          ],
+          "synonyms": []
+        },
+        {
+          "id": "lactarius-fragilis",
+          "scientificName": "Lactarius fragilis",
+          "commonNames": [
+            "Eastern candy cap"
+          ],
+          "synonyms": []
+        }
+      ]
+    },
+    {
+      "id": "puffballs",
+      "name": "Giant puffballs",
+      "aliases": [
+        "puffball",
+        "puffballs",
+        "giant puffball",
+        "western giant puffball",
+        "calvatia"
+      ],
+      "inatTaxa": [
+        "Calvatia booniana",
+        "Calvatia sculpta",
+        "Calvatia gigantea"
+      ],
+      "hostFloor": 1.0,
+      "hostTrees": [],
+      "lookalikes": "Cut every puffball from top to bottom. It must be pure white and even inside; the outline of a cap and gills means a deadly Amanita egg. Earthballs (Scleroderma) are firm and dark inside and toxic.",
+      "species": [
+        {
+          "id": "calvatia-booniana",
+          "scientificName": "Calvatia booniana",
+          "commonNames": [
+            "Western giant puffball"
+          ],
+          "synonyms": []
+        },
+        {
+          "id": "calvatia-sculpta",
+          "scientificName": "Calvatia sculpta",
+          "commonNames": [
+            "Sculptured puffball",
+            "Sierran puffball"
+          ],
+          "synonyms": []
+        },
+        {
+          "id": "calvatia-gigantea",
+          "scientificName": "Calvatia gigantea",
+          "commonNames": [
+            "Giant puffball"
+          ],
+          "synonyms": []
         }
       ]
     }

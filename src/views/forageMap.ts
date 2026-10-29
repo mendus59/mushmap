@@ -6,7 +6,7 @@ import {
   forecastPointIndex, isoWeek, ownFindHistory, regionTotal, scoreCells, topSpots, weatherForWeek, weekStart,
   type CellScore, type CurrentWeather, type Forecast, type Grid, type Model, type ModelIndex,
 } from '../heatmapModel';
-import { SAFETY_NOTE, legalNoteEl } from '../legal';
+import { SAFETY_NOTE, groupNotes } from '../legal';
 import { fillModelSelect, getJson, shortDate, weekLabel } from '../generated';
 import { BASE_MAPS, addBaseMaps, createMap, maplibregl, setBaseMap, type BaseMap } from '../map';
 import { expandSpeciesId, type Catalog } from '../species';
@@ -368,7 +368,7 @@ export function forageMapView(catalog: Catalog, uid: string): HTMLElement {
     own = grid ? ownFindHistory(grid, cellIndex, findCells.filter((f) => ids.has(f.speciesId)).map((f) => f.cell)) : null;
     clear(legalSlot);
     const group = catalog.groups.find((g) => g.id === id || g.species.some((s) => s.id === id));
-    if (group?.legalNote) legalSlot.append(legalNoteEl());
+    legalSlot.append(...groupNotes(group));
     drawOutlook();
     draw();
     setReady();
