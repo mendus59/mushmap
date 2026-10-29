@@ -1042,7 +1042,7 @@
         "Pleurotus ostreatus",
         "Pleurotus populinus"
       ],
-      "hostFloor": 0.2,
+      "hostFloor": 0.4,
       "hostTrees": [
         {
           "fia": 351,
@@ -1221,7 +1221,6 @@
         "funnel chanterelle"
       ],
       "inatTaxa": [
-        "Craterellus neotubaeformis",
         "Craterellus tubaeformis"
       ],
       "hostFloor": 0.1,
@@ -1255,14 +1254,14 @@
       "lookalikes": "Deadly Galerina marginata and other little brown mushrooms grow on the same rotting logs. Yellowfoot have blunt, forked false gills, a hollow yellow stem and a brown funnel cap.",
       "species": [
         {
-          "id": "craterellus-neotubaeformis",
-          "scientificName": "Craterellus neotubaeformis",
+          "id": "craterellus-tubaeformis",
+          "scientificName": "Craterellus tubaeformis",
           "commonNames": [
             "Yellowfoot",
             "Winter chanterelle"
           ],
           "synonyms": [
-            "Craterellus tubaeformis",
+            "Craterellus neotubaeformis",
             "Cantharellus tubaeformis"
           ]
         }
