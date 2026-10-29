@@ -19,6 +19,11 @@ A mushroom foraging journal and heat map for Washington and Oregon, hosted on Gi
   to 100 for easy, gentle trails on open public land that start at a road or trailhead. Pick a mushroom and a
   week, search the map view or draw an area, and get the trails ranked by the geometric mean of the chance
   of the mushroom along them (from the heat map) and their accessibility.
+- **What's likely here.** Tap a trail, draw an area, or use the map view, pick a date (today by default),
+  and see every tracked mushroom ranked by how likely it is there, from the same heat map scores (60% the
+  best spot, 40% the average across the place). Very unlikely ones (under 10%) are left off the list.
+  Weather counts only for dates from a week ago to three weeks ahead; other dates use season, place and
+  host trees.
 - **Installable app.** MushMap is a Progressive Web App. On Android or desktop Chrome and Edge, use
   **Install app** in the top bar (or the browser's install menu); on an iPhone or iPad, open it in Safari and
   pick Share > Add to Home Screen. Once opened online, the app itself loads offline, and the last heat map,
