@@ -11,8 +11,8 @@ import { fillModelSelect, getJson, shortDate, weekLabel } from '../generated';
 import { BASE_MAPS, addBaseMaps, createMap, maplibregl, setBaseMap, type BaseMap } from '../map';
 import { expandSpeciesId, type Catalog } from '../species';
 import {
-  accessLabel, areaPublicLand, decodePolyline, describeAccess, rankTrails,
-  type Bounds, type RankedTrail, type TrailData,
+  accessLabel, areaPublicLand, decodePolyline, describeAccess, detectPlatform, navigationLinks, nearestEnd,
+  rankTrails, type Bounds, type RankedTrail, type Trail, type TrailData,
 } from '../trailsModel';
 
 const ACCESS_COLORS = ['interpolate', ['linear'], ['get', 's'],
@@ -20,6 +20,8 @@ const ACCESS_COLORS = ['interpolate', ['linear'], ['get', 's'],
 const RESULT_COUNT = 20;
 /** Trails are only drawn from this zoom in, where there are few enough to read. */
 const TRAILS_MIN_ZOOM = 7;
+/** Trail layers that take clicks: wide, invisible lines so a thin trail is easy to tap. */
+const TRAIL_HIT_LAYERS = ['trails-hit', 'results-hit'];
 
 function pct(x: number): string {
   return `${Math.round(x * 100)}%`;
@@ -30,6 +32,14 @@ function rectangle(a: LngLat, b: LngLat): Bounds {
     west: Math.min(a.lng, b.lng), east: Math.max(a.lng, b.lng),
     south: Math.min(a.lat, b.lat), north: Math.max(a.lat, b.lat),
   };
+}
+
+function trailFeatures(t: Trail, properties: Record<string, number>) {
+  return t.l.map((line) => ({
+    type: 'Feature' as const,
+    properties,
+    geometry: { type: 'LineString' as const, coordinates: decodePolyline(line) },
+  }));
 }
 
 function boundsPolygon(b: Bounds) {
@@ -100,6 +110,9 @@ export function forageMapView(catalog: Catalog, uid: string): HTMLElement {
   let centres: [number, number][] = [];
   let area: Bounds | null = null;
   let ranked: RankedTrail[] = [];
+  let selected: number | null = null;
+  let openPopup: maplibregl.Popup | null = null;
+  const platform = detectPlatform(navigator.userAgent);
   const models = new Map<string, Promise<Model | null>>();
   const boundaries = new Map<number, [number, number][]>();
 
@@ -191,20 +204,51 @@ export function forageMapView(catalog: Catalog, uid: string): HTMLElement {
     if (area) search(area);
   };
 
-  const trailPopup = (i: number, at: LngLat | [number, number], r?: RankedTrail) => {
+  const setSelected = (i: number | null) => {
+    selected = i;
+    (map.getSource('selected') as GeoJSONSource | undefined)?.setData({
+      type: 'FeatureCollection',
+      features: i === null ? [] : trailFeatures(trailData!.trails[i], { i }),
+    });
+    for (const li of results.querySelectorAll<HTMLElement>('li[data-i]')) {
+      li.classList.toggle('selected', Number(li.dataset.i) === i);
+    }
+  };
+
+  /** Highlights a trail and opens its details, with directions to the trail end nearest `at`. */
+  const selectTrail = (i: number, at: [number, number], r?: RankedTrail) => {
     const t = trailData!.trails[i];
-    const html = document.createElement('div');
-    html.append(h('strong', {}, t.n), h('br'), `Accessibility: ${t.s}/100 (${accessLabel(t.s)})`, h('br'));
+    openPopup?.remove();
+    setSelected(i);
+    const html = h('div', { class: 'trail-popup' },
+      h('strong', {}, t.n), h('br'), `Accessibility: ${t.s}/100 (${accessLabel(t.s)})`, h('br'));
     if (r) html.append(`Chance of the mushroom along it: ${pct(r.likelihood)}`, h('br'), `Overall: ${pct(r.overall)}`, h('br'));
     html.append(h('small', {}, describeAccess(t)));
-    new maplibregl.Popup({ maxWidth: '320px' }).setLngLat(at).setDOMContent(html).addTo(map);
+    const end = nearestEnd(t, at);
+    if (end) {
+      const [lng, lat] = end;
+      html.append(
+        h('div', { class: 'nav-title' }, 'Directions to the nearest trail end'),
+        h('div', { class: 'nav-links' }, ...navigationLinks(lat, lng, t.n, platform).map((l) =>
+          h('a', { class: 'button', href: l.href, target: l.href.startsWith('http') ? '_blank' : null, rel: 'noopener' }, l.label))),
+      );
+    }
+    const popup = new maplibregl.Popup({ maxWidth: '320px' }).setLngLat(at).setDOMContent(html).addTo(map);
+    popup.on('close', () => {
+      if (openPopup === popup) {
+        openPopup = null;
+        if (selected === i) setSelected(null);
+      }
+    });
+    openPopup = popup;
   };
 
   const showTrail = (r: RankedTrail) => {
     const [w, s, e, n] = r.trail.b;
     map.fitBounds([[w, s], [e, n]], { padding: 60, maxZoom: 14 });
     const [lat, lng] = cellToLatLng(grid!.cells[r.bestCell]);
-    trailPopup(r.index, [lng, lat], r);
+    selectTrail(r.index, [lng, lat], r);
+    mapEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
   };
 
   const cellScores = (): Float32Array => {
@@ -220,13 +264,10 @@ export function forageMapView(catalog: Catalog, uid: string): HTMLElement {
     ranked = rankTrails(trailData!.trails, cellScores(), b, RESULT_COUNT);
     (map.getSource('results') as GeoJSONSource | undefined)?.setData({
       type: 'FeatureCollection',
-      features: ranked.flatMap((r, rank) => r.trail.l.map((line) => ({
-        type: 'Feature' as const,
-        properties: { i: r.index, s: r.trail.s, rank: rank + 1 },
-        geometry: { type: 'LineString' as const, coordinates: decodePolyline(line) },
-      }))),
+      features: ranked.flatMap((r, rank) => trailFeatures(r.trail, { i: r.index, s: r.trail.s, rank: rank + 1 })),
     });
     clear(results);
+    if (selected !== null && !ranked.some((r) => r.index === selected)) openPopup?.remove();
     const label = select.selectedOptions[0]?.textContent?.replace(/ \(.*\)$/, '') ?? 'this mushroom';
     if (!ranked.length) {
       const land = areaPublicLand(trailData!.cellLand, centres, b);
@@ -238,7 +279,7 @@ export function forageMapView(catalog: Catalog, uid: string): HTMLElement {
       'Overall combines the chance along the trail with its accessibility.';
     ranked.forEach((r) => {
       const t = r.trail;
-      results.append(h('li', {},
+      results.append(h('li', { 'data-i': r.index, class: r.index === selected ? 'selected' : null },
         h('button', { class: 'trail', onclick: () => showTrail(r) },
           h('span', { class: 'row between' },
             h('strong', {}, t.n),
@@ -290,14 +331,11 @@ export function forageMapView(catalog: Catalog, uid: string): HTMLElement {
       type: 'geojson',
       data: {
         type: 'FeatureCollection',
-        features: trailData.trails.flatMap((t, i) => t.l.map((line) => ({
-          type: 'Feature' as const,
-          properties: { i, s: t.s },
-          geometry: { type: 'LineString' as const, coordinates: decodePolyline(line) },
-        }))),
+        features: trailData.trails.flatMap((t, i) => trailFeatures(t, { i, s: t.s })),
       },
     });
     map.addSource('results', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+    map.addSource('selected', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
     map.addSource('area', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
     map.addLayer({
       id: 'area', type: 'line', source: 'area',
@@ -333,12 +371,35 @@ export function forageMapView(catalog: Catalog, uid: string): HTMLElement {
         'line-width': ['interpolate', ['linear'], ['zoom'], 6, 3, 13, 6],
       },
     });
-    for (const layer of ['trails', 'results']) {
-      map.on('click', layer, (e) => {
-        const i = e.features?.[0]?.properties?.i;
-        if (typeof i !== 'number') return;
-        trailPopup(i, e.lngLat, ranked.find((r) => r.index === i));
-      });
+    // The picked trail glows on top of everything, at any zoom.
+    map.addLayer({
+      id: 'selected-glow', type: 'line', source: 'selected',
+      layout: { 'line-cap': 'round', 'line-join': 'round' },
+      paint: { 'line-color': '#ffffff', 'line-width': ['interpolate', ['linear'], ['zoom'], 6, 10, 13, 16], 'line-opacity': 0.9 },
+    });
+    map.addLayer({
+      id: 'selected', type: 'line', source: 'selected',
+      layout: { 'line-cap': 'round', 'line-join': 'round' },
+      paint: { 'line-color': '#1e6bd6', 'line-width': ['interpolate', ['linear'], ['zoom'], 6, 4, 13, 8] },
+    });
+    map.addLayer({
+      id: 'trails-hit', type: 'line', source: 'trails', minzoom: TRAILS_MIN_ZOOM,
+      paint: { 'line-color': '#000000', 'line-opacity': 0, 'line-width': 16 },
+    });
+    map.addLayer({
+      id: 'results-hit', type: 'line', source: 'results',
+      paint: { 'line-color': '#000000', 'line-opacity': 0, 'line-width': 18 },
+    });
+    map.on('click', (e) => {
+      const layers = TRAIL_HIT_LAYERS.filter((l) => map.getLayer(l) && map.getLayoutProperty(l, 'visibility') !== 'none');
+      const hits = map.queryRenderedFeatures(e.point, { layers });
+      // A recommended trail wins over an ordinary one under the same tap.
+      const hit = hits.find((f) => f.layer.id === 'results-hit') ?? hits[0];
+      const i = hit?.properties?.i;
+      if (typeof i !== 'number') return;
+      selectTrail(i, [e.lngLat.lng, e.lngLat.lat], ranked.find((r) => r.index === i));
+    });
+    for (const layer of TRAIL_HIT_LAYERS) {
       map.on('mouseenter', layer, () => { map.getCanvas().style.cursor = 'pointer'; });
       map.on('mouseleave', layer, () => { map.getCanvas().style.cursor = ''; });
     }
@@ -354,7 +415,7 @@ export function forageMapView(catalog: Catalog, uid: string): HTMLElement {
     if (!map.isStyleLoaded()) return;
     const vis = (on: boolean) => (on ? 'visible' : 'none');
     if (map.getLayer('cells')) map.setLayoutProperty('cells', 'visibility', vis(showHeat.checked));
-    for (const id of ['trails', 'trails-casing']) {
+    for (const id of ['trails', 'trails-casing', 'trails-hit']) {
       if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', vis(showTrails.checked));
     }
   };
@@ -406,7 +467,9 @@ export function forageMapView(catalog: Catalog, uid: string): HTMLElement {
     });
     map.on('click', 'cells', (e) => {
       // A trail on top of the cell gets the click.
-      const onTrail = map.queryRenderedFeatures(e.point, { layers: ['trails', 'results'].filter((l) => map.getLayer(l)) });
+      const onTrail = map.queryRenderedFeatures(e.point, {
+        layers: TRAIL_HIT_LAYERS.filter((l) => map.getLayer(l) && map.getLayoutProperty(l, 'visibility') !== 'none'),
+      });
       if (onTrail.length) return;
       const i = e.features?.[0]?.properties?.i;
       const s = typeof i === 'number' ? scores[i] : undefined;

@@ -160,3 +160,60 @@ export function areaPublicLand(cellLand: number[], cellCentres: [number, number]
   });
   return n ? sum / n : null;
 }
+
+/** The two ends of each line of a trail, as [lng, lat]. */
+export function trailEnds(t: Trail): [number, number][] {
+  return t.l.flatMap((line) => {
+    const pts = decodePolyline(line);
+    return pts.length ? [pts[0], pts[pts.length - 1]] : [];
+  });
+}
+
+/**
+ * The end of a trail nearest a point, as [lng, lat]. The trail data has no trailhead points, so the
+ * end nearest where the person tapped (or the trail's best spot) stands in for the trailhead.
+ */
+export function nearestEnd(t: Trail, to: [number, number]): [number, number] | null {
+  const cosLat = Math.cos((to[1] * Math.PI) / 180);
+  let best: [number, number] | null = null;
+  let bestD = Infinity;
+  for (const p of trailEnds(t)) {
+    const d = ((p[0] - to[0]) * cosLat) ** 2 + (p[1] - to[1]) ** 2;
+    if (d < bestD) {
+      bestD = d;
+      best = p;
+    }
+  }
+  return best;
+}
+
+export type Platform = 'android' | 'apple' | 'other';
+
+export function detectPlatform(userAgent: string): Platform {
+  if (/Android/i.test(userAgent)) return 'android';
+  if (/iPhone|iPad|iPod|Macintosh/i.test(userAgent)) return 'apple';
+  return 'other';
+}
+
+export interface NavLink {
+  label: string;
+  href: string;
+}
+
+/**
+ * Links that open driving directions to a point in the navigation apps on the device: the geo: link
+ * lets Android offer every installed maps app, Apple Maps opens on iPhone and Mac, and Google Maps and
+ * Waze open their apps when installed or the website when not.
+ */
+export function navigationLinks(lat: number, lng: number, name: string, platform: Platform): NavLink[] {
+  const ll = `${lat.toFixed(6)},${lng.toFixed(6)}`;
+  const google = { label: 'Google Maps', href: `https://www.google.com/maps/dir/?api=1&destination=${ll}&travelmode=driving` };
+  const apple = { label: 'Apple Maps', href: `https://maps.apple.com/?daddr=${ll}&dirflg=d&q=${encodeURIComponent(name)}` };
+  const waze = { label: 'Waze', href: `https://waze.com/ul?ll=${ll}&navigate=yes` };
+  if (platform === 'android') {
+    const label = name.replace(/[()]/g, '');
+    return [{ label: 'Maps app', href: `geo:0,0?q=${ll}(${encodeURIComponent(label)})` }, google, waze];
+  }
+  if (platform === 'apple') return [apple, google, waze];
+  return [google, apple, waze];
+}
