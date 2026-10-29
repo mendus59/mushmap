@@ -8,7 +8,7 @@ import {
   cellsInBounds, likelihoodLabel, likelihoodReasons, localIsoDate, parseLocalDate, placeLikelihood, rankMushrooms,
   weatherCovers, type RankedMushroom,
 } from '../placeOutlook';
-import type { Catalog } from '../species';
+import { describeSpeciesId, type Catalog } from '../species';
 import type { Bounds } from '../trailsModel';
 
 export type Place =
@@ -102,7 +102,7 @@ export function likelyHerePanel(
       if (id !== runId) return; // the place or date changed meanwhile
       if (!model) continue;
       const { likelihood, best } = placeLikelihood(d.grid, model, cells, week, weather, d.ownFor(entry.id));
-      items.push({ id: entry.id, label: entry.label, likelihood, best });
+      items.push({ id: entry.id, label: describeSpeciesId(catalog, entry.id)?.label ?? entry.label, likelihood, best });
     }
     const { shown, hidden } = rankMushrooms(items);
     clear(list);

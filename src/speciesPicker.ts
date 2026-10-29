@@ -22,7 +22,9 @@ export function speciesPicker(catalog: Catalog, opts: { placeholder: string; onC
           class: o.kind === 'group' ? 'group' : 'species',
           onmousedown: (e: Event) => { e.preventDefault(); choose(o); },
         },
-        h('span', { class: o.kind === 'species' ? 'sci' : '' }, o.label),
+        o.sci
+          ? h('span', {}, o.common ? `${o.common} (` : '', h('em', {}, o.sci), o.common ? ')' : '')
+          : h('span', {}, o.label),
         h('small', {}, o.detail)),
       );
     }
