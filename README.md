@@ -27,7 +27,7 @@ A mushroom foraging journal and heat map for Washington and Oregon, hosted on Gi
 | Site | Vite + TypeScript, no framework, deployed to GitHub Pages by `.github/workflows/deploy.yml` |
 | Accounts and data | Firebase Authentication (Google, email) and Cloud Firestore on the free Spark plan |
 | Photos | Compressed in the browser to about 150 KB WebP and stored in Firestore (`users/{uid}/finds/{id}/photos/{n}`) |
-| Maps | MapLibre GL with OpenFreeMap tiles (free, no key) |
+| Maps | MapLibre GL with OpenFreeMap tiles; zoomed in, the USGS National Map topo (forest roads, trails, contours) or OpenTopoMap (all free, no key) |
 | Elevation | Open-Meteo elevation API for single finds; AWS Terrain Tiles for the heat map grid (both free, no key) |
 
 ## Firebase setup

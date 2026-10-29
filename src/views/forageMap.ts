@@ -8,7 +8,7 @@ import {
 } from '../heatmapModel';
 import { SAFETY_NOTE, legalNoteEl } from '../legal';
 import { fillModelSelect, getJson, shortDate, weekLabel } from '../generated';
-import { createMap, maplibregl } from '../map';
+import { BASE_MAPS, addBaseMaps, createMap, maplibregl, setBaseMap, type BaseMap } from '../map';
 import { expandSpeciesId, type Catalog } from '../species';
 import {
   accessLabel, areaPublicLand, decodePolyline, describeAccess, rankTrails,
@@ -19,7 +19,7 @@ const ACCESS_COLORS = ['interpolate', ['linear'], ['get', 's'],
   8, '#9e2a2a', 35, '#e08a2c', 60, '#d9c13a', 80, '#6aa84f', 100, '#1f7a3a'] as const;
 const RESULT_COUNT = 20;
 /** Trails are only drawn from this zoom in, where there are few enough to read. */
-const TRAILS_MIN_ZOOM = 8;
+const TRAILS_MIN_ZOOM = 7;
 
 function pct(x: number): string {
   return `${Math.round(x * 100)}%`;
@@ -68,6 +68,12 @@ export function forageMapView(catalog: Catalog, uid: string): HTMLElement {
   const status = h('p', { class: 'muted' }, 'Loading map data…');
   const showHeat = h('input', { type: 'checkbox', checked: true });
   const showTrails = h('input', { type: 'checkbox', checked: true });
+  const baseSelect = h('select', { 'aria-label': 'Base map' },
+    ...BASE_MAPS.map((b) => h('option', { value: b.id }, b.label)));
+  try {
+    const saved = localStorage.getItem('mushmap.baseMap');
+    if (saved && BASE_MAPS.some((b) => b.id === saved)) baseSelect.value = saved;
+  } catch { /* storage blocked: keep the default */ }
   const searchView = h('button', { class: 'primary', disabled: true }, 'Find trails in this view');
   const drawArea = h('button', { disabled: true }, 'Draw an area');
   const resultsNote = h('p', { class: 'muted' }, 'Pick a mushroom and a week, then search the map view or draw an area.');
@@ -297,17 +303,28 @@ export function forageMapView(catalog: Catalog, uid: string): HTMLElement {
       id: 'area', type: 'line', source: 'area',
       paint: { 'line-color': '#3d4a2f', 'line-width': 2, 'line-dasharray': [2, 2] },
     });
+    // A dark outline keeps trails readable over the heat map and the topo base map.
+    map.addLayer({
+      id: 'trails-casing', type: 'line', source: 'trails', minzoom: TRAILS_MIN_ZOOM,
+      layout: { 'line-cap': 'round', 'line-join': 'round' },
+      paint: {
+        'line-color': '#1b1d18',
+        'line-width': ['interpolate', ['linear'], ['zoom'], 7, 3, 13, 6],
+        'line-opacity': 0.8,
+      },
+    });
     map.addLayer({
       id: 'trails', type: 'line', source: 'trails', minzoom: TRAILS_MIN_ZOOM,
+      layout: { 'line-cap': 'round', 'line-join': 'round' },
       paint: {
         'line-color': ACCESS_COLORS as unknown as string,
-        'line-width': ['interpolate', ['linear'], ['zoom'], 8, 1.5, 13, 3],
-        'line-opacity': 0.85,
+        'line-width': ['interpolate', ['linear'], ['zoom'], 7, 1.5, 13, 3.5],
       },
     });
     map.addLayer({
       id: 'results-casing', type: 'line', source: 'results',
-      paint: { 'line-color': '#ffffff', 'line-width': ['interpolate', ['linear'], ['zoom'], 6, 5, 13, 9] },
+      layout: { 'line-cap': 'round', 'line-join': 'round' },
+      paint: { 'line-color': '#1b1d18', 'line-width': ['interpolate', ['linear'], ['zoom'], 6, 6, 13, 10] },
     });
     map.addLayer({
       id: 'results', type: 'line', source: 'results',
@@ -337,7 +354,9 @@ export function forageMapView(catalog: Catalog, uid: string): HTMLElement {
     if (!map.isStyleLoaded()) return;
     const vis = (on: boolean) => (on ? 'visible' : 'none');
     if (map.getLayer('cells')) map.setLayoutProperty('cells', 'visibility', vis(showHeat.checked));
-    if (map.getLayer('trails')) map.setLayoutProperty('trails', 'visibility', vis(showTrails.checked));
+    for (const id of ['trails', 'trails-casing']) {
+      if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', vis(showTrails.checked));
+    }
   };
 
   const loadModel = async (id: string) => {
@@ -371,6 +390,8 @@ export function forageMapView(catalog: Catalog, uid: string): HTMLElement {
   };
 
   map.on('load', () => {
+    addBaseMaps(map);
+    setBaseMap(map, baseSelect.value as BaseMap);
     map.addSource('cells', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
     map.addLayer({
       id: 'cells',
@@ -379,7 +400,8 @@ export function forageMapView(catalog: Catalog, uid: string): HTMLElement {
       paint: {
         'fill-color': ['interpolate', ['linear'], ['get', 'score'],
           0.08, '#ffe9a8', 0.3, '#f6a03d', 0.6, '#d9542c', 1, '#8c1d18'],
-        'fill-opacity': 0.65,
+        // Fainter as you zoom in, so trails, roads and contours show through.
+        'fill-opacity': ['interpolate', ['linear'], ['zoom'], 6, 0.6, 10, 0.4, 13, 0.25],
       },
     });
     map.on('click', 'cells', (e) => {
@@ -439,6 +461,10 @@ export function forageMapView(catalog: Catalog, uid: string): HTMLElement {
   week.addEventListener('input', draw);
   showHeat.addEventListener('change', setVisibility);
   showTrails.addEventListener('change', setVisibility);
+  baseSelect.addEventListener('change', () => {
+    if (map.isStyleLoaded()) setBaseMap(map, baseSelect.value as BaseMap);
+    try { localStorage.setItem('mushmap.baseMap', baseSelect.value); } catch { /* not remembered */ }
+  });
   searchView.addEventListener('click', () => {
     const b = map.getBounds();
     search({ west: b.getWest(), south: b.getSouth(), east: b.getEast(), north: b.getNorth() });
@@ -452,6 +478,7 @@ export function forageMapView(catalog: Catalog, uid: string): HTMLElement {
       h('label', { class: 'field' }, h('span', {}, 'Species or group'), select),
       h('div', { class: 'field' }, h('span', {}, 'Outlook for the region'), outlookEl),
       h('label', { class: 'field' }, h('span', {}, 'Week'), weekText, week),
+      h('label', { class: 'field' }, h('span', {}, 'Base map'), baseSelect),
       h('div', { class: 'row layer-toggles' },
         h('label', { class: 'inline' }, showHeat, 'Heat map'),
         h('label', { class: 'inline' }, showTrails, 'Trails')),
