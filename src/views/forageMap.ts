@@ -14,6 +14,7 @@ import {
   accessLabel, areaPublicLand, decodePolyline, describeAccess, detectPlatform, navigationLinks, nearestEnd,
   rankTrails, type Bounds, type RankedTrail, type Trail, type TrailData,
 } from '../trailsModel';
+import { cellCentres, likelyHerePanel } from './likelyHere';
 
 const ACCESS_COLORS = ['interpolate', ['linear'], ['get', 's'],
   8, '#9e2a2a', 35, '#e08a2c', 60, '#d9c13a', 80, '#6aa84f', 100, '#1f7a3a'] as const;
@@ -115,6 +116,27 @@ export function forageMapView(catalog: Catalog, uid: string): HTMLElement {
   const platform = detectPlatform(navigator.userAgent);
   const models = new Map<string, Promise<Model | null>>();
   const boundaries = new Map<number, [number, number][]>();
+  const fetchModel = (id: string) => {
+    if (!models.has(id)) models.set(id, getJson<Model>(`model/${id}.json`));
+    return models.get(id)!;
+  };
+  const ownFor = (id: string) => {
+    if (!grid) return null;
+    const ids = expandSpeciesId(catalog, id);
+    return ownFindHistory(grid, cellIndex, findCells.filter((f) => ids.has(f.speciesId)).map((f) => f.cell));
+  };
+  const viewBounds = (): Bounds => {
+    const b = map.getBounds();
+    return { west: b.getWest(), south: b.getSouth(), east: b.getEast(), north: b.getNorth() };
+  };
+  const likely = likelyHerePanel(catalog, {
+    mapViewBounds: viewBounds,
+    onShow: (id) => {
+      select.value = id;
+      void loadModel(id);
+      mapEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    },
+  });
 
   const boundary = (i: number) => {
     let b = boundaries.get(i);
@@ -224,6 +246,14 @@ export function forageMapView(catalog: Catalog, uid: string): HTMLElement {
       h('strong', {}, t.n), h('br'), `Accessibility: ${t.s}/100 (${accessLabel(t.s)})`, h('br'));
     if (r) html.append(`Chance of the mushroom along it: ${pct(r.likelihood)}`, h('br'), `Overall: ${pct(r.overall)}`, h('br'));
     html.append(h('small', {}, describeAccess(t)));
+    likely.setPlace({ kind: 'trail', label: t.n, cells: t.c });
+    html.append(h('div', {}, h('button', {
+      type: 'button', class: 'text-link',
+      onclick: () => {
+        likely.run();
+        likely.el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      },
+    }, 'What mushrooms are likely here?')));
     const end = nearestEnd(t, at);
     if (end) {
       const [lng, lat] = end;
@@ -318,7 +348,10 @@ export function forageMapView(catalog: Catalog, uid: string): HTMLElement {
       map.dragPan.enable();
       map.getCanvas().style.cursor = '';
       drawArea.textContent = 'Draw an area';
-      if (b.east - b.west > 0.005 && b.north - b.south > 0.005) search(b);
+      if (b.east - b.west > 0.005 && b.north - b.south > 0.005) {
+        likely.setPlace({ kind: 'area', label: 'Your drawn area', bounds: b });
+        search(b);
+      }
     };
     canvas.addEventListener('pointerdown', down);
     canvas.addEventListener('pointermove', move);
@@ -421,12 +454,10 @@ export function forageMapView(catalog: Catalog, uid: string): HTMLElement {
   };
 
   const loadModel = async (id: string) => {
-    if (!models.has(id)) models.set(id, getJson<Model>(`model/${id}.json`));
-    const m = await models.get(id)!;
+    const m = await fetchModel(id);
     if (select.value !== id) return; // the user picked something else meanwhile
     model = m;
-    const ids = expandSpeciesId(catalog, id);
-    own = grid ? ownFindHistory(grid, cellIndex, findCells.filter((f) => ids.has(f.speciesId)).map((f) => f.cell)) : null;
+    own = ownFor(id);
     clear(legalSlot);
     const group = catalog.groups.find((g) => g.id === id || g.species.some((s) => s.id === id));
     legalSlot.append(...groupNotes(group));
@@ -502,9 +533,14 @@ export function forageMapView(catalog: Catalog, uid: string): HTMLElement {
       findCells = finds
         .filter((x) => x.speciesId && x.lat !== null && x.lon !== null)
         .map((x) => ({ speciesId: x.speciesId!, cell: latLngToCell(x.lat!, x.lon!, g.res) }));
+      centres = cellCentres(g);
+      likely.setData({
+        grid: g, cellIndex, centres, current, forecast, ownFor,
+        models: index.models.filter((m) => m.kind === 'group'),
+        loadModel: fetchModel,
+      });
       if (t) {
         trailData = t;
-        centres = g.cells.map((c) => cellToLatLng(c) as [number, number]);
         addTrailLayers();
         setVisibility();
       } else {
@@ -529,8 +565,9 @@ export function forageMapView(catalog: Catalog, uid: string): HTMLElement {
     try { localStorage.setItem('mushmap.baseMap', baseSelect.value); } catch { /* not remembered */ }
   });
   searchView.addEventListener('click', () => {
-    const b = map.getBounds();
-    search({ west: b.getWest(), south: b.getSouth(), east: b.getEast(), north: b.getNorth() });
+    const b = viewBounds();
+    likely.setPlace({ kind: 'area', label: 'The searched map view', bounds: b });
+    search(b);
   });
   drawArea.addEventListener('click', startDrawing);
   requestAnimationFrame(() => map.resize());
@@ -549,6 +586,7 @@ export function forageMapView(catalog: Catalog, uid: string): HTMLElement {
       status,
       legalSlot),
     mapEl,
+    likely.el,
     h('div', { class: 'card' },
       h('h2', {}, 'Best trails'),
       resultsNote,

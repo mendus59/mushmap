@@ -215,11 +215,14 @@ export function regionTotal(scores: CellScore[]): number {
   return scores.reduce((sum, s) => sum + s.score, 0);
 }
 
-/** Pass `current` from weatherForWeek(). `own` raises history where the user has logged finds. */
-export function scoreCells(
-  grid: Grid, model: Model, week: number, minScore = MIN_SCORE, current: CurrentWeather | null = null,
+/**
+ * A scorer for one model and week: returns a cell's score, or null for cells out of season or with no
+ * elevation. Pass `current` from weatherForWeek(). `own` raises history where the user has logged finds.
+ */
+export function cellScorer(
+  grid: Grid, model: Model, week: number, current: CurrentWeather | null = null,
   own: Map<number, number> | null = null,
-): CellScore[] {
+): (i: number) => CellScore | null {
   const row = model.seasonElev[week - 1] ?? [];
   const bins = row.length;
   const history = new Map<number, number>();
@@ -229,20 +232,32 @@ export function scoreCells(
   const hostFloor = model.hostFloor ?? 1;
   const host = new Map<number, number>();
   if (hasHost) model.hostIdx!.forEach((idx, i) => host.set(idx, model.hostVal![i] / 100));
-  const out: CellScore[] = [];
-  for (let i = 0; i < grid.cells.length; i++) {
+  return (i) => {
     const elev = grid.elev[i];
-    if (elev === null || elev === undefined) continue;
+    if (elev === null || elev === undefined) return null;
     const bin = Math.max(0, Math.min(bins - 1, Math.round(elev / model.elevBinM)));
     const season = (row[bin] ?? 0) / 100;
-    if (season === 0) continue;
+    if (season === 0) return null;
     const o = own?.get(i) ?? 0;
     const h = Math.max(history.get(i) ?? 0, o);
     const t = hasHost ? host.get(i) ?? 0 : null;
     const w = current && model.weather ? weatherLift(model.weather, current.p14[i], current.t7[i]) : null;
     const score = Math.min(1,
       season * (floor + (1 - floor) * h) * (t === null ? 1 : hostFloor + (1 - hostFloor) * t) * (w ?? 1));
-    if (score >= minScore) out.push({ index: i, score, season, history: h, own: o > 0, host: t, weather: w });
+    return { index: i, score, season, history: h, own: o > 0, host: t, weather: w };
+  };
+}
+
+/** Pass `current` from weatherForWeek(). `own` raises history where the user has logged finds. */
+export function scoreCells(
+  grid: Grid, model: Model, week: number, minScore = MIN_SCORE, current: CurrentWeather | null = null,
+  own: Map<number, number> | null = null,
+): CellScore[] {
+  const score = cellScorer(grid, model, week, current, own);
+  const out: CellScore[] = [];
+  for (let i = 0; i < grid.cells.length; i++) {
+    const s = score(i);
+    if (s && s.score >= minScore) out.push(s);
   }
   return out;
 }
