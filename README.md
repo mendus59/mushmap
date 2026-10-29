@@ -13,7 +13,8 @@ A mushroom foraging journal and heat map for Washington and Oregon, hosted on Gi
   rain and temperature compare with the weather before past finds. An outlook strip compares the next five
   weeks across the region, a list names the most likely spots, and your own logged finds count as sightings
   on your map.
-- **Trail finder.** OpenStreetMap trails over Washington and Oregon, coloured by an accessibility score:
+- **Trail finder.** On the same map as the heat map, with each layer switchable, so the heat map can sit under
+  the trails. OpenStreetMap trails over Washington and Oregon, coloured by an accessibility score:
   about 8 for trails on private or closed land, about 50 for steep or difficult trails on public land, and up
   to 100 for easy, gentle trails on open public land that start at a road or trailhead. Pick a mushroom and a
   week, search the map view or draw an area, and get the trails ranked by the geometric mean of the chance
