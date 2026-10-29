@@ -97,6 +97,9 @@ export function forageMapView(catalog: Catalog, uid: string): HTMLElement {
   const legalSlot = h('div');
   const mapEl = h('div', { class: 'map large' });
   const map: MapLibreMap = createMap(mapEl);
+  // Set once on 'load'. isStyleLoaded() is false whenever any tile is still loading, so it cannot
+  // gate adding layers: trail data arriving mid-load would be dropped and never added.
+  let styleReady = false;
 
   let grid: Grid | null = null;
   let model: Model | null = null;
@@ -360,7 +363,7 @@ export function forageMapView(catalog: Catalog, uid: string): HTMLElement {
   };
 
   const addTrailLayers = () => {
-    if (!trailData || !map.isStyleLoaded() || map.getSource('trails')) return;
+    if (!trailData || !styleReady || map.getSource('trails')) return;
     map.addSource('trails', {
       type: 'geojson',
       data: {
@@ -446,7 +449,7 @@ export function forageMapView(catalog: Catalog, uid: string): HTMLElement {
   };
 
   const setVisibility = () => {
-    if (!map.isStyleLoaded()) return;
+    if (!styleReady) return;
     const vis = (on: boolean) => (on ? 'visible' : 'none');
     if (map.getLayer('cells')) map.setLayoutProperty('cells', 'visibility', vis(showHeat.checked));
     for (const id of ['trails', 'trails-casing', 'trails-hit']) {
@@ -483,6 +486,7 @@ export function forageMapView(catalog: Catalog, uid: string): HTMLElement {
   };
 
   map.on('load', () => {
+    styleReady = true;
     addBaseMaps(map);
     setBaseMap(map, baseSelect.value as BaseMap);
     map.addSource('cells', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
@@ -562,7 +566,7 @@ export function forageMapView(catalog: Catalog, uid: string): HTMLElement {
   showHeat.addEventListener('change', setVisibility);
   showTrails.addEventListener('change', setVisibility);
   baseSelect.addEventListener('change', () => {
-    if (map.isStyleLoaded()) setBaseMap(map, baseSelect.value as BaseMap);
+    if (styleReady) setBaseMap(map, baseSelect.value as BaseMap);
     try { localStorage.setItem('mushmap.baseMap', baseSelect.value); } catch { /* not remembered */ }
   });
   searchView.addEventListener('click', () => {
