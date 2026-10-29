@@ -138,13 +138,14 @@ input[type=range] { width: 100%; margin-top: 6px; }
   text-decoration: none; font-weight: 600; font-size: 0.85rem;
 }
 
-.likely-list { margin: 0; padding-left: 1.6em; display: grid; gap: 10px; }
-.likely { display: flex; flex-direction: column; gap: 4px; }
-.likely-score { font-weight: 700; color: var(--accent); }
-.likely-bar { display: block; height: 6px; border-radius: 3px; background: var(--border); overflow: hidden; }
-.likely-bar span { display: block; height: 100%; background: #d9542c; }
-.likely .text-link { align-self: flex-start; font-size: 0.85rem; }
+/* Not "likely": ad blockers hide .likely, the class of a social share button library. */
+.mush-list { margin: 0; padding-left: 1.6em; display: grid; gap: 10px; }
+.mush-row { display: flex; flex-direction: column; gap: 4px; }
+.mush-score { font-weight: 700; color: var(--accent); }
+.mush-bar { display: block; height: 6px; border-radius: 3px; background: var(--border); overflow: hidden; }
+.mush-bar span { display: block; height: 100%; background: #d9542c; }
+.mush-row .text-link { align-self: flex-start; font-size: 0.85rem; }
 button.text-link { background: none; border: none; padding: 0; color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
 .trail-popup button.text-link { color: #1e6bd6; margin-top: 8px; font-weight: 600; }
-.likely-place, .likely-date { gap: 10px; align-items: center; flex-wrap: wrap; }
-.likely-date input { flex: 1; width: auto; min-width: 0; }
+.mush-place, .mush-date { gap: 10px; align-items: center; flex-wrap: wrap; }
+.mush-date input { flex: 1; width: auto; min-width: 0; }
