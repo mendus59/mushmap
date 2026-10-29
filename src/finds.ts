@@ -5,7 +5,7 @@ import {
 import { getFirebase } from './firebase';
 
 export type ClusterSize = 'solitary' | 'small' | 'large';
-export type LocationSource = 'exif' | 'manual' | 'none';
+export type LocationSource = 'exif' | 'manual' | 'device' | 'none';
 
 export const MAX_PHOTOS_PER_FIND = 8;
 
