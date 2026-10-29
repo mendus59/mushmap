@@ -56,7 +56,7 @@ export function likelyHerePanel(
   const note = h('p', { class: 'muted' }, 'Loading map data…');
   const help = h('p', { class: 'muted' },
     'Tap a trail, draw an area, or use the map view, and pick a date. The list updates as you go.');
-  const list = h('ol', { class: 'likely-list' });
+  const list = h('ol', { class: 'mush-list' });
   const hiddenNote = h('p', { class: 'muted' });
 
   let data: PlaceData | null = null;
@@ -131,11 +131,11 @@ export function likelyHerePanel(
       const group = catalog.groups.find((g) => g.id === m.id);
       const why = likelihoodReasons(m.best);
       list.append(h('li', {},
-        h('div', { class: 'likely' },
+        h('div', { class: 'mush-row' },
           h('span', { class: 'row between' },
             h('strong', {}, m.label),
-            h('span', { class: 'likely-score' }, `${pct(m.likelihood)} · ${likelihoodLabel(m.likelihood)}`)),
-          h('span', { class: 'likely-bar' }, h('span', { style: `width:${Math.max(3, Math.round(m.likelihood * 100))}%` })),
+            h('span', { class: 'mush-score' }, `${pct(m.likelihood)} · ${likelihoodLabel(m.likelihood)}`)),
+          h('span', { class: 'mush-bar' }, h('span', { style: `width:${Math.max(3, Math.round(m.likelihood * 100))}%` })),
           why ? h('small', { class: 'muted' }, why) : null,
           group?.legalNote ? h('small', { class: 'muted' }, 'Illegal to possess in Washington and Oregon; tracked for study only.') : null,
           h('button', { type: 'button', class: 'text-link', onclick: () => opts.onShow(m.id) }, 'Show on the map'))));
@@ -165,8 +165,8 @@ export function likelyHerePanel(
 
   const el = h('div', { class: 'card' },
     h('h2', {}, 'What\'s likely here'),
-    h('div', { class: 'field' }, h('span', {}, 'Place'), h('div', { class: 'row likely-place' }, placeText, useView)),
-    h('label', { class: 'field' }, h('span', {}, 'Date'), h('div', { class: 'row likely-date' }, date, todayBtn)),
+    h('div', { class: 'field' }, h('span', {}, 'Place'), h('div', { class: 'row mush-place' }, placeText, useView)),
+    h('label', { class: 'field' }, h('span', {}, 'Date'), h('div', { class: 'row mush-date' }, date, todayBtn)),
     help,
     note,
     list,
