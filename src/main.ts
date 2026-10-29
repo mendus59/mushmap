@@ -18,13 +18,12 @@ const currentRoute = (): Route => {
 function renderNav() {
   clear(nav);
   if (!user) return;
-  const link = (route: Route, label: string) =>
-    h('a', { href: `#/${route}`, class: currentRoute() === route ? 'active' : '' }, label);
+  const link = (route: Route, label: string, also: Route[] = [route]) =>
+    h('a', { href: `#/${route}`, class: also.includes(currentRoute()) ? 'active' : '' }, label);
   nav.append(
     link('finds', 'My finds'),
     link('add', 'Log a find'),
-    link('heatmap', 'Heat map'),
-    link('trails', 'Trail finder'),
+    link('heatmap', 'Map', ['heatmap', 'trails']),
     h('button', { class: 'link', onclick: () => signOut(getFirebase().auth) }, 'Sign out'),
   );
 }
@@ -45,20 +44,17 @@ async function render() {
   const catalog = await loadCatalog();
   const uid = user.uid;
   // Views load on demand so the map library is not in the first download.
+  // The trail finder and heat map share one page; #/trails is kept for old links.
   switch (currentRoute()) {
     case 'add': {
       const { addFindView } = await import('./views/addFind');
       app.append(addFindView(uid, catalog, () => { location.hash = '#/finds'; }));
       break;
     }
-    case 'heatmap': {
-      const { heatmapView } = await import('./views/heatmap');
-      app.append(heatmapView(catalog, uid));
-      break;
-    }
+    case 'heatmap':
     case 'trails': {
-      const { trailsView } = await import('./views/trails');
-      app.append(trailsView(catalog, uid));
+      const { forageMapView } = await import('./views/forageMap');
+      app.append(forageMapView(catalog, uid));
       break;
     }
     default: {
