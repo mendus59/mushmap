@@ -1,5 +1,17 @@
 # MushMap
 
+<!-- site-summary:start -->
+<!-- This section is this project's card on https://mendus59.github.io and is copied there daily.
+     Keep it true of what's on main: one plain-text summary line (max 160 characters), then 1-6 short bullets.
+     See CLAUDE.md ("Site summary"). -->
+A mushroom foraging journal and weekly heat map for Washington and Oregon.
+
+- Log a find from a photo: the time and GPS location come from the photo's EXIF data.
+- A weekly likelihood map per species, built from research-grade iNaturalist sightings, USDA host-tree maps, elevation, and this year's rain and temperature against past finds.
+- A trail finder that ranks OpenStreetMap trails by the chance of a mushroom along them and how accessible the trail is.
+- Installable as an app and works offline.
+<!-- site-summary:end -->
+
 A mushroom foraging journal and heat map for Washington and Oregon, hosted on GitHub Pages at
 <https://mendus59.github.io/mushmap/>.
 
