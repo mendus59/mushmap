@@ -9,6 +9,7 @@ A mushroom foraging journal and weekly heat map for Washington and Oregon.
 - Log a find from a photo: the time and GPS location come from the photo's EXIF data.
 - A weekly likelihood map per species, built from research-grade iNaturalist sightings, USDA host-tree maps, elevation, and this year's rain and temperature against past finds.
 - A trail finder that ranks OpenStreetMap trails by the chance of a mushroom along them and how accessible the trail is.
+- Tap a trail or draw an area to see every tracked mushroom ranked by how likely it is there on a given date.
 - Installable as an app and works offline.
 <!-- site-summary:end -->
 
