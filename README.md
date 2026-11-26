@@ -13,6 +13,9 @@ A mushroom foraging journal and weekly heat map for Washington and Oregon.
 - Installable as an app and works offline.
 <!-- site-summary:end -->
 
+<!-- site-screenshot: docs/screenshot.jpg -->
+![Screenshot of MushMap](docs/screenshot.jpg)
+
 A mushroom foraging journal and heat map for Washington and Oregon, hosted on GitHub Pages at
 <https://mendus59.github.io/mushmap/>.
 
