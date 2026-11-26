@@ -11,6 +11,7 @@ A mushroom foraging journal and weekly heat map for Washington and Oregon.
 - A trail finder that ranks OpenStreetMap trails by the chance of a mushroom along them and how accessible the trail is.
 - Tap a trail or draw an area to see every tracked mushroom ranked by how likely it is there on a given date.
 - Installable as an app and works offline.
+- The map and trail finder work without an account; sign in to keep a private journal of finds.
 <!-- site-summary:end -->
 
 A mushroom foraging journal and heat map for Washington and Oregon, hosted on GitHub Pages at

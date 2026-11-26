@@ -20,8 +20,9 @@ export function signInView(): HTMLElement {
   };
 
   return h('section', { class: 'card narrow' },
-    h('h1', {}, 'Sign in to MushMap'),
-    h('p', {}, 'Your finds and photos are private to your account.'),
+    h('h1', {}, 'Sign in to keep a journal'),
+    h('p', {}, 'The heat map and trail finder are free to use without an account. Sign in to log your own finds from photos. Your finds and photos are private to your account.'),
+    h('p', {}, h('a', { href: '#/heatmap' }, 'Explore the map without signing in')),
     h('button', { class: 'primary wide', onclick: () => run(() => signInWithPopup(auth, new GoogleAuthProvider())) }, 'Continue with Google'),
     h('p', { class: 'divider' }, 'or use email'),
     h('form', {
