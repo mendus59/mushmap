@@ -75,7 +75,7 @@ function weatherWords(lift: number): string {
 }
 
 /** The heat map and the trail finder on one map, each layer switchable. */
-export function forageMapView(catalog: Catalog, uid: string): HTMLElement {
+export function forageMapView(catalog: Catalog, uid: string | null): HTMLElement {
   const status = h('p', { class: 'muted' }, 'Loading map data…');
   const showHeat = h('input', { type: 'checkbox', checked: true });
   const showTrails = h('input', { type: 'checkbox', checked: true });
@@ -524,7 +524,7 @@ export function forageMapView(catalog: Catalog, uid: string): HTMLElement {
         getJson<ModelIndex>('model/index.json'), getJson<Grid>('cells.json'),
         getJson<CurrentWeather>('weather/current.json').catch(() => null),
         getJson<Forecast>('weather/forecast.json').catch(() => null),
-        listFinds(uid).catch(() => []),
+        (uid ? listFinds(uid) : Promise.resolve([])).catch(() => []),
         getJson<TrailData>('trails/trails.json').catch(() => null),
       ]);
       current = w;
